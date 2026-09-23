@@ -166,7 +166,7 @@
   .card-visual::after{ bottom:10px; right:10px; border-bottom:1px solid var(--accent); border-left:none; border-right:1px solid var(--accent); }
 
 
-  .thumb-row{ display:flex; gap:6px; margin-top:10px; }
+  .thumb-row{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
   .thumb-row img{
     width:42px; height:42px; object-fit:cover; border:1px solid var(--line);
     cursor:pointer; opacity:.55; transition:.15s; flex-shrink:0;
@@ -469,21 +469,23 @@
     return 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(text);
   }
 
+  const IMAGES_PER_DESIGN = 6;
+
   function cardHTML(cat, n){
     const base = 'images/' + cat.id + '/' + n;
     const label = cat.name + ' - تصميم ' + n;
     const tag = 'NO. ' + String(n).padStart(2,'0');
 
+    let thumbs = '';
+    for(let i=1; i<=IMAGES_PER_DESIGN; i++){
+      thumbs += `<img src="${base}-${i}.jpg" class="${i===1?'active':''}" onclick="rabkaSwap(this)" onerror="this.style.display='none'">`;
+    }
+
     const visual = `
       <div class="card-visual">
         <img class="main-img" src="${base}-1.jpg" alt="${cat.name}" onerror="this.closest('.card').style.display='none';">
       </div>
-      <div class="thumb-row">
-        <img src="${base}-1.jpg" class="active" onclick="rabkaSwap(this)" onerror="this.style.display='none'">
-        <img src="${base}-2.jpg" onclick="rabkaSwap(this)" onerror="this.style.display='none'">
-        <img src="${base}-3.jpg" onclick="rabkaSwap(this)" onerror="this.style.display='none'">
-        <img src="${base}-4.jpg" onclick="rabkaSwap(this)" onerror="this.style.display='none'">
-      </div>`;
+      <div class="thumb-row">${thumbs}</div>`;
 
     const specsHTML = cat.specs.map(s=>`<li>${s}</li>`).join('');
 
