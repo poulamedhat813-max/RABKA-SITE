@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة صور RABKA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060606; --surface:#0e0e10; --surface-2:#141416; --line:#2b2b2d;
+    --ink:#f1efea; --muted:#948f88; --accent:#c9c4b8; --danger:#c9645b; --ok:#7fae86;
+    color-scheme: dark;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Tajawal', sans-serif; line-height:1.7; }
+  button{ font-family:inherit; cursor:pointer; }
+  img{ max-width:100%; display:block; }
+  .wrap{ max-width:880px; margin:0 auto; padding:28px 20px 80px; }
+  h1{ font-size:clamp(22px,4vw,30px); font-weight:900; }
+  .sub{ color:var(--muted); font-size:14px; margin-top:6px; }
+  .steps{ margin-top:22px; padding:16px 18px; background:var(--surface); border:1px solid var(--line); font-size:13.5px; color:var(--muted); }
+  .steps b{ color:var(--ink); }
+  .steps ol{ padding-inline-start:20px; margin-top:6px; }
+  .steps li{ margin-top:4px; }
+  .panel{ margin-top:26px; padding:20px; background:var(--surface); border:1px solid var(--line); }
+  .panel h2{ font-size:15px; margin-bottom:4px; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .field{ flex:1; min-width:180px; }
+  label.field-label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+  select, input[type="number"], input[type="text"], input[type="password"]{
+    width:100%; background:var(--surface-2); border:1px solid var(--line);
+    color:var(--ink); padding:11px 12px; font-family:inherit; font-size:14.5px;
+  }
+  select:focus, input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+  .slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px; }
+  @media (max-width:520px){ .slots{ grid-template-columns:repeat(2,1fr); } }
+  .slot{ position:relative; aspect-ratio:1; background:var(--surface-2); border:1px dashed var(--line); display:flex; align-items:center; justify-content:center; overflow:hidden; text-align:center; }
+  .slot.filled{ border-style:solid; }
+  .slot input[type="file"]{ display:none; }
+  .slot .tapzone{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:none; border:none; color:inherit; width:100%; height:100%; }
+  .slot .placeholder{ font-size:12px; color:var(--muted); padding:6px; }
+  .slot .placeholder b{ display:block; color:var(--ink); font-size:20px; font-weight:400; margin-bottom:4px; }
+  .slot img{ width:100%; height:100%; object-fit:cover; pointer-events:none; }
+  .slot .rm{ position:absolute; top:4px; left:4px; width:22px; height:22px; background:rgba(6,6,6,.75); color:var(--ink); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; z-index:2; }
+  .slot .tag{ position:absolute; bottom:0; right:0; left:0; padding:3px 6px; font-size:10.5px; background:rgba(6,6,6,.7); color:var(--muted); text-align:center; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 20px; border:1px solid var(--accent); color:var(--bg); background:var(--accent); font-weight:700; font-size:14.5px; }
+  .btn:disabled{ opacity:.4; cursor:not-allowed; }
+  .btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
+  .btn.danger{ background:transparent; color:var(--danger); border-color:var(--danger); }
+  .actions{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; }
+  .status{ font-size:13px; color:var(--muted); margin-top:10px; min-height:16px; }
+  .badge{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:6px 10px; border:1px solid var(--line); margin-top:12px; }
+  .badge.ok{ border-color:var(--ok); color:var(--ok); }
+  .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .log{ margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .litem{ display:flex; align-items:center; gap:12px; padding:10px; background:var(--surface-2); border:1px solid var(--line); font-size:13.5px; }
+  .litem img{ width:44px; height:44px; object-fit:cover; flex:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>لوحة صور RABKA</h1>
+  <p class="sub">ارفع صورة التصميم من هنا، وتظهر على موقعك الرسمي أوتوماتيك خلال دقيقة تقريبًا — من غير ملفات مضغوطة ولا رفع يدوي.</p>
+
+  <div class="panel" id="settingsPanel">
+    <h2>الإعداد (مرة واحدة بس)</h2>
+    <p class="sub" style="margin-bottom:14px;">محتاج تربط اللوحة دي بريبوزيتوري موقعك على GitHub. اعمل التوكن من الخطوات تحت، والصقه هنا.</p>
+    <div class="row">
+      <div class="field">
+        <label class="field-label">اسم المستخدم على GitHub</label>
+        <input type="text" id="ghOwner" placeholder="مثلاً: mohamed123">
+      </div>
+      <div class="field">
+        <label class="field-label">اسم الريبوزيتوري</label>
+        <input type="text" id="ghRepo" placeholder="rabka-site" value="rabka-site">
+      </div>
+    </div>
+    <div class="row" style="margin-top:14px;">
+      <div class="field">
+        <label class="field-label">GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="github_pat_...">
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="saveSettingsBtn">حفظ الإعداد</button>
+      <button class="btn ghost" id="clearSettingsBtn">مسح البيانات المحفوظة</button>
+    </div>
+    <div id="connBadge"></div>
+
+    <div class="steps" style="margin-top:18px;">
+      <b>ازاي تعمل التوكن (خطوة أول مرة بس):</b>
+      <ol>
+        <li>افتح <span class="sub" style="color:var(--ink);">github.com/settings/personal-access-tokens/new</span> وانت داخل حسابك.</li>
+        <li>في Repository access اختار Only select repositories، واختار ريبوزيتوري rabka-site.</li>
+        <li>تحت Permissions دوس Contents واختار Access: Read and write.</li>
+        <li>دوس Generate token، وانسخ التوكن (بيبدأ بـ github_pat_).</li>
+        <li>الصقه في الخانة فوق ودوس "حفظ الإعداد". التوكن بيتخزن في متصفحك بس، مش بيترفع على الموقع.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>ارفع تصميم</h2>
+    <div class="row" style="margin-top:14px;">
+      <div class="field">
+        <label class="field-label">الصنف</label>
+        <select id="category">
+          <option value="hoodie">Hoodie — هودي</option>
+          <option value="round">Round — راوند</option>
+          <option value="straight-pants">Straight Pants — شتوي</option>
+          <option value="half-zip">Half Zip</option>
+          <option value="tee">Tee — تيشيرت صيفي</option>
+          <option value="interlock">Interlock Box Fit</option>
+          <option value="straight-pants-summer">Straight Pants — صيفي</option>
+          <option value="womens-oversized">Women's Oversized</option>
+        </select>
+      </div>
+      <div class="field" style="max-width:160px;">
+        <label class="field-label">رقم التصميم</label>
+        <input type="number" id="designNum" min="1" value="1">
+      </div>
+    </div>
+
+    <div class="slots" id="slots"></div>
+
+    <div class="actions">
+      <button class="btn" id="uploadBtn">ارفع التصميم على الموقع</button>
+      <button class="btn ghost" id="clearSlotsBtn">امسح الصور دي</button>
+    </div>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="panel">
+    <h2>آخر التصاميم المرفوعة (في الجلسة دي)</h2>
+    <div class="log" id="log"></div>
+  </div>
+</div>
+
+<script>
+  const CATS = [
+    ['hoodie','Hoodie'],['round','Round'],['straight-pants','Straight Pants (شتوي)'],
+    ['half-zip','Half Zip'],['tee','Tee'],['interlock','Interlock Box Fit'],
+    ['straight-pants-summer','Straight Pants (صيفي)'],['womens-oversized',"Women's Oversized"]
+  ];
+  const catLabel = id => (CATS.find(c=>c[0]===id) || [id,id])[1];
+  const SLOT_COUNT = 6;
+  const STORAGE_KEY = 'rabka_admin_gh_settings';
+
+  let slots = new Array(SLOT_COUNT).fill(null);
+
+  const slotsEl = document.getElementById('slots');
+  const statusEl = document.getElementById('status');
+  const logEl = document.getElementById('log');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const connBadge = document.getElementById('connBadge');
+
+  // ---------- settings ----------
+  function loadSettings(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e){ return null; }
+  }
+  function saveSettingsToStorage(s){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e){}
+  }
+  function renderBadge(){
+    const s = loadSettings();
+    if(s && s.owner && s.repo && s.token){
+      connBadge.innerHTML = `<span class="badge ok"><span class="dot"></span> متصل بـ ${s.owner}/${s.repo}</span>`;
+    } else {
+      connBadge.innerHTML = `<span class="badge"><span class="dot"></span> مش متصل لسه</span>`;
+    }
+  }
+  (function initSettingsFields(){
+    const s = loadSettings();
+    if(s){
+      document.getElementById('ghOwner').value = s.owner || '';
+      document.getElementById('ghRepo').value = s.repo || 'rabka-site';
+      document.getElementById('ghToken').value = s.token || '';
+    }
+    renderBadge();
+  })();
+  document.getElementById('saveSettingsBtn').addEventListener('click', ()=>{
+    const owner = document.getElementById('ghOwner').value.trim();
+    const repo = document.getElementById('ghRepo').value.trim();
+    const token = document.getElementById('ghToken').value.trim();
+    if(!owner || !repo || !token){
+      statusEl.textContent = 'حط اسم المستخدم واسم الريبو والتوكن الأول.';
+      return;
+    }
+    saveSettingsToStorage({owner, repo, token});
+    renderBadge();
+    statusEl.textContent = 'اتحفظ الإعداد.';
+  });
+  document.getElementById('clearSettingsBtn').addEventListener('click', ()=>{
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('ghOwner').value = '';
+    document.getElementById('ghRepo').value = 'rabka-site';
+    document.getElementById('ghToken').value = '';
+    renderBadge();
+  });
+
+  // ---------- slots ----------
+  function renderSlots(){
+    slotsEl.innerHTML = '';
+    slots.forEach((s, i)=>{
+      const div = document.createElement('div');
+      div.className = 'slot' + (s ? ' filled' : '');
+      if(s){
+        div.innerHTML = `<img src="${s.url}"><button type="button" class="rm" data-i="${i}">×</button><span class="tag">${i===0?'رئيسية':'صورة '+(i+1)}</span>`;
+      } else {
+        div.innerHTML = `
+          <input type="file" accept="image/*" id="file-input-${i}" data-i="${i}">
+          <button type="button" class="tapzone" data-i="${i}">
+            <div class="placeholder"><b>+</b>${i===0?'الصورة الرئيسية':'صورة '+(i+1)}</div>
+          </button>`;
+      }
+      slotsEl.appendChild(div);
+    });
+    slotsEl.querySelectorAll('.tapzone').forEach(btn=>{
+      btn.addEventListener('click', ()=> document.getElementById('file-input-'+btn.dataset.i).click());
+    });
+    slotsEl.querySelectorAll('input[type="file"]').forEach(inp=>{
+      inp.addEventListener('change', e=>{
+        const i = +inp.dataset.i;
+        const file = e.target.files[0];
+        if(!file) return;
+        if(slots[i]) URL.revokeObjectURL(slots[i].url);
+        slots[i] = { file, url: URL.createObjectURL(file) };
+        renderSlots();
+      });
+    });
+    slotsEl.querySelectorAll('.rm').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = +btn.dataset.i;
+        URL.revokeObjectURL(slots[i].url);
+        slots[i] = null;
+        renderSlots();
+      });
+    });
+  }
+  renderSlots();
+
+  document.getElementById('clearSlotsBtn').addEventListener('click', ()=>{
+    slots.forEach(s=>{ if(s) URL.revokeObjectURL(s.url); });
+    slots = new Array(SLOT_COUNT).fill(null);
+    renderSlots();
+    statusEl.textContent = '';
+  });
+
+  // ---------- image conversion ----------
+  function fileToJpegBlob(file){
+    return new Promise((resolve, reject)=>{
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,0,0);
+        canvas.toBlob(blob=>{
+          URL.revokeObjectURL(url);
+          if(blob) resolve(blob); else reject(new Error('convert failed'));
+        }, 'image/jpeg', 0.9);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('load failed')); };
+      img.src = url;
+    });
+  }
+  function blobToBase64(blob){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(String(reader.result).split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  // ---------- GitHub API ----------
+  async function ghGetSha(owner, repo, token, path){
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if(res.status === 200){
+      const data = await res.json();
+      return data.sha;
+    }
+    return null;
+  }
+  async function ghPutFile(owner, repo, token, path, base64Content, message){
+    const sha = await ghGetSha(owner, repo, token, path);
+    const body = { message, content: base64Content, branch: 'main' };
+    if(sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      let msg = 'HTTP ' + res.status;
+      try{ const err = await res.json(); if(err.message) msg = err.message; } catch(e){}
+      throw new Error(msg);
+    }
+    return res.json();
+  }
+
+  function addLogItem(category, designNum, count, thumbUrl){
+    const div = document.createElement('div');
+    div.className = 'litem';
+    div.innerHTML = `<img src="${thumbUrl}"><div>${catLabel(category)} — تصميم ${designNum} <span class="sub">(${count} صورة اترفعت)</span></div>`;
+    logEl.prepend(div);
+  }
+
+  uploadBtn.addEventListener('click', async ()=>{
+    const settings = loadSettings();
+    if(!settings || !settings.owner || !settings.repo || !settings.token){
+      statusEl.textContent = 'اعمل الإعداد فوق الأول (اسم المستخدم، الريبو، والتوكن).';
+      return;
+    }
+    const category = document.getElementById('category').value;
+    const designNum = parseInt(document.getElementById('designNum').value, 10);
+    if(!designNum || designNum < 1){ statusEl.textContent = 'حط رقم تصميم صحيح.'; return; }
+    if(!slots[0]){ statusEl.textContent = 'محتاج الصورة الرئيسية على الأقل.'; return; }
+
+    uploadBtn.disabled = true;
+    let uploaded = 0;
+    let thumbUrl = slots[0].url;
+    try{
+      for(let i = 0; i < slots.length; i++){
+        if(!slots[i]) continue;
+        statusEl.textContent = `بيترفع صورة ${i+1}...`;
+        const blob = await fileToJpegBlob(slots[i].file);
+        const base64 = await blobToBase64(blob);
+        const path = `images/${category}/${designNum}-${i+1}.jpg`;
+        await ghPutFile(settings.owner, settings.repo, settings.token, path, base64,
+          `Add ${category} design ${designNum} image ${i+1}`);
+        uploaded++;
+      }
+      statusEl.textContent = `تم رفع ${uploaded} صورة لتصميم رقم ${designNum}. الموقع هيتحدث لوحده خلال دقيقة تقريبًا.`;
+      addLogItem(category, designNum, uploaded, thumbUrl);
+      slots.forEach(s=>{ if(s) URL.revokeObjectURL(s.url); });
+      slots = new Array(SLOT_COUNT).fill(null);
+      renderSlots();
+      document.getElementById('designNum').value = designNum + 1;
+    } catch(err){
+      statusEl.textContent = 'حصل خطأ: ' + err.message + ' — تأكد من صحة التوكن واسم المستخدم والريبو.';
+    } finally {
+      uploadBtn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
