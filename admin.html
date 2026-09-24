@@ -322,6 +322,42 @@
     logEl.prepend(div);
   }
 
+  // ---------- designs.json manifest ----------
+  async function ghGetJsonFile(owner, repo, token, path){
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+      headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' }
+    });
+    if(res.status === 200){
+      const data = await res.json();
+      const text = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+      return { sha: data.sha, json: JSON.parse(text) };
+    }
+    return { sha: null, json: {} };
+  }
+  async function updateManifest(owner, repo, token, category, designNum){
+    const path = 'designs.json';
+    const { sha, json } = await ghGetJsonFile(owner, repo, token, path);
+    if(!Array.isArray(json[category])) json[category] = [];
+    if(!json[category].includes(designNum)) json[category].push(designNum);
+    const base64 = btoa(unescape(encodeURIComponent(JSON.stringify(json, null, 2))));
+    const body = { message: `Update designs.json: ${category} ${designNum}`, content: base64, branch: 'main' };
+    if(sha) body.sha = sha;
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      let msg = 'HTTP ' + res.status;
+      try{ const err = await res.json(); if(err.message) msg = err.message; } catch(e){}
+      throw new Error(msg);
+    }
+  }
+
   uploadBtn.addEventListener('click', async ()=>{
     const settings = loadSettings();
     if(!settings || !settings.owner || !settings.repo || !settings.token){
@@ -347,6 +383,8 @@
           `Add ${category} design ${designNum} image ${i+1}`);
         uploaded++;
       }
+      statusEl.textContent = 'بيحدّث قايمة التصاميم...';
+      await updateManifest(settings.owner, settings.repo, settings.token, category, designNum);
       statusEl.textContent = `تم رفع ${uploaded} صورة لتصميم رقم ${designNum}. الموقع هيتحدث لوحده خلال دقيقة تقريبًا.`;
       addLogItem(category, designNum, uploaded, thumbUrl);
       slots.forEach(s=>{ if(s) URL.revokeObjectURL(s.url); });
