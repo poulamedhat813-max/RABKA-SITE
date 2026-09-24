@@ -393,32 +393,18 @@
   /* =========================================================
      RABKA — نظام التصاميم المتعددة لكل صنف
      =========================================================
-     كل صنف (هودي / راوند / ... إلخ) ممكن يكون له عدد كبير من
-     التصاميم، وكل تصميم ليه لحد 4 صور. الكارت بتاع أي تصميم
-     بيظهر لوحده تلقائي بمجرد ما تحط صورته الأولى في الفولدر —
-     مش محتاج تلمس السطور دي أبدًا لإضافة تصميم جديد.
+     الموقع بيعرض بالظبط التصاميم المكتوبة في ملف designs.json
+     (اللي جنب index.html)، ومش بيخمّن أو يجرّب أرقام عشوائية.
 
-     شكل أسماء الصور المطلوب لكل تصميم داخل فولدر الصنف:
+     ملف designs.json بيتحدّث لوحده أوتوماتيك أول ما ترفع تصميم
+     من لوحة admin.html — مفيش داعي تلمسه يدوي أبدًا.
+
+     أسماء الصور المتوقعة لكل تصميم داخل فولدر الصنف:
        images/<اسم-الصنف>/<رقم التصميم>-1.jpg   (الصورة الرئيسية)
-       images/<اسم-الصنف>/<رقم التصميم>-2.jpg
-       images/<اسم-الصنف>/<رقم التصميم>-3.jpg
-       images/<اسم-الصنف>/<رقم التصميم>-4.jpg
-
-     مثال: عندك تصميم هودي رقم 7، الصور بتبقى:
-       images/hoodie/7-1.jpg
-       images/hoodie/7-2.jpg
-       images/hoodie/7-3.jpg
-       images/hoodie/7-4.jpg
-
-     مش لازم تحط الـ 4 صور - لو حطيت "1" بس هيظهر التصميم برضه.
-     لو التصميم مفيهوش صورة "1" خالص، مش هيظهر في الموقع خالص
-     (مش هتشوف كارت فاضي)، لحد ما تضيف صورته.
+       images/<اسم-الصنف>/<رقم التصميم>-2.jpg  ... لحد -6.jpg
      ========================================================= */
 
   const WA_NUMBER = '201224062277';
-
-  // زوّد الرقم ده لو أي صنف عندك فيه أكتر من 60 تصميم
-  const MAX_DESIGNS = 60;
 
   const CATEGORIES = [
     { id:'hoodie', season:'winter', name:'Hoodie',
@@ -546,18 +532,31 @@
       </div>
     </div>`;
 
-  function renderAll(){
+  async function loadManifest(){
+    try{
+      const res = await fetch('designs.json?_=' + Date.now(), { cache: 'no-store' });
+      if(!res.ok) return {};
+      return await res.json();
+    } catch(e){
+      return {};
+    }
+  }
+
+  async function renderAll(){
+    const manifest = await loadManifest();
     const winterHTML = [];
     const summerHTML = [];
     CATEGORIES.forEach(cat=>{
       const target = cat.season === 'winter' ? winterHTML : summerHTML;
-      for(let n=1; n<=MAX_DESIGNS; n++){
-        target.push(cardHTML(cat, n));
-      }
+      const designs = (manifest[cat.id] || []).slice().sort((a,b)=>a-b);
+      designs.forEach(n=> target.push(cardHTML(cat, n)) );
     });
     summerHTML.push(comingSoonHTML);
-    document.getElementById('grid-winter').innerHTML = winterHTML.join('');
+    document.getElementById('grid-winter').innerHTML = winterHTML.join('') || emptyNote('لسه مفيش تصاميم شتوي متاحة.');
     document.getElementById('grid-summer').innerHTML = summerHTML.join('');
+  }
+  function emptyNote(text){
+    return `<p style="color:var(--muted); padding:20px 0;">${text}</p>`;
   }
   renderAll();
 
