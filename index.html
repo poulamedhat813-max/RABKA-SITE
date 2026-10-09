@@ -3,7 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RABKA</title>
+<title>RABKA — Made to Order Streetwear</title>
+<meta name="description" content="RABKA براند مصري لقطع ستريت وير بتتعمل بالطلب: هودي، راوند، هاف زيب، بانتس وتيشيرتات بخامات تقيلة. توصيل لحد الباب ودفع عند الاستلام.">
+<meta name="theme-color" content="#060606">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23060606'/%3E%3Cpath d='M10 32V8H22C26 8 28.5 10.5 28.5 14C28.5 17 26.8 19 24 19.8L29 32H23.5L19 20.5H15V32H10Z' fill='none' stroke='%23f1efea' stroke-width='2'/%3E%3Cpath d='M15 20.5L10 32' stroke='%23f1efea' stroke-width='2'/%3E%3C/svg%3E">
+
+<!-- معاينة الرابط (واتساب / انستجرام / فيسبوك)
+     مهم: غيّر YOUR-DOMAIN لرابط موقعك الحقيقي (مثلاً https://username.github.io/RABKA-SITE)
+     لازم يكون رابط كامل (absolute) عشان المعاينة تشتغل. -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ar_EG">
+<meta property="og:site_name" content="RABKA">
+<meta property="og:title" content="RABKA — Made to Order Streetwear">
+<meta property="og:description" content="قطع ستريت وير بتتعمل بالطلب بخامات تقيلة. هودي، راوند، هاف زيب وبانتس. توصيل لكل مصر.">
+<meta property="og:url" content="https://YOUR-DOMAIN/">
+<meta property="og:image" content="https://YOUR-DOMAIN/images/hoodie/1-1.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800;900&family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -65,9 +80,24 @@
   .icon-btn{ width:34px; height:34px; display:flex; align-items:center; justify-content:center; border:1px solid var(--line); }
   .icon-btn:hover{ border-color:var(--accent); }
   .icon-btn svg{ width:16px; height:16px; }
-  .nav-toggle{ display:none; }
+  .nav-toggle{
+    display:none; width:34px; height:34px; padding:0;
+    align-items:center; justify-content:center;
+    border:1px solid var(--line); background:transparent;
+  }
+  .nav-toggle svg{ width:16px; height:16px; }
+  .nav-toggle:hover, .nav-toggle[aria-expanded="true"]{ border-color:var(--accent); }
   @media (max-width:760px){
-    nav{ display:none; }
+    .nav-toggle{ display:flex; }
+    header .header-actions .btn{ display:none; }
+    nav{
+      display:none; position:fixed; top:70px; inset-inline:0;
+      flex-direction:column; gap:0; padding:4px 24px 12px;
+      background:rgba(6,6,6,.97); border-bottom:1px solid var(--line);
+    }
+    nav.open{ display:flex; }
+    nav a{ padding:15px 0; font-size:16px; color:var(--ink); border-bottom:1px solid var(--line); }
+    nav a:last-child{ border-bottom:none; }
   }
 
   /* ---------- hero ---------- */
@@ -199,8 +229,17 @@
   }
   .order-btn:hover{ background:var(--ink); color:var(--bg); }
   .order-btn svg{ width:14px; height:14px; }
-  .sizes{ display:flex; gap:6px; margin-top:14px; }
-  .sizes span{ font-family:'Inter'; font-size:11px; border:1px solid var(--line); color:var(--muted); padding:4px 9px; }
+  .size-select{ display:flex; gap:6px; flex-wrap:wrap; margin-top:14px; }
+  .size-btn{
+    font-family:'Inter'; direction:ltr; font-size:12px; min-width:42px;
+    border:1px solid var(--line); background:transparent; color:var(--muted);
+    padding:6px 12px; transition:.15s;
+  }
+  .size-btn:hover{ border-color:var(--accent); color:var(--ink); }
+  .size-btn.active{ border-color:var(--ink); color:var(--ink); background:var(--surface-2); }
+  .size-select.need{ outline:1px solid #c9645b; outline-offset:5px; }
+  .size-hint{ display:none; font-size:12.5px; color:#d98277; margin-top:10px; }
+  .size-select.need + .size-hint{ display:block; }
 
   /* ---------- season tabs ---------- */
   .season-tabs{ display:flex; gap:10px; margin-bottom:0; }
@@ -287,7 +326,7 @@
     </svg>
     <span>RABKA</span>
   </div>
-  <nav>
+  <nav id="mainNav" aria-label="القائمة الرئيسية">
     <a href="#about">من إحنا</a>
     <a href="#products">المنتجات</a>
     <a href="#info">سياسة الاستبدال</a>
@@ -298,6 +337,9 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="#f1efea" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1"/></svg>
     </a>
     <a class="btn" href="#products" style="padding:10px 18px; font-size:13px;">تصفح المنتجات</a>
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="القائمة" aria-expanded="false" aria-controls="mainNav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#f1efea" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
   </div>
 </header>
 
@@ -457,60 +499,61 @@
 
   const IMAGES_PER_DESIGN = 6;
 
+  /* كل صنف في CATEGORIES ممكن يبقى فيه أي مجموعة من:
+       fits  : [{fit, price?}]  -> أزرار القصّة (والسعر لو متحدد لكل قصّة)
+       sizes : ['S','M','L']    -> أزرار المقاس (بتتبعت في رسالة الواتساب)
+       price : رقم              -> سعر ثابت لو مفيش سعر لكل قصّة
+     ولو sizes موجودة، العميل لازم يختار مقاس قبل "اطلب الآن".
+     تقدر تضيف sizes لأي صنف (هودي/راوند/تيشيرت) وهيشتغل علطول. */
   function cardHTML(cat, n){
     const base = 'images/' + cat.id + '/' + n;
     const label = cat.name + ' - تصميم ' + n;
     const tag = 'NO. ' + String(n).padStart(2,'0');
 
+    const hasFits  = Array.isArray(cat.fits)  && cat.fits.length > 0;
+    const hasSizes = Array.isArray(cat.sizes) && cat.sizes.length > 0;
+    const firstFit = hasFits ? cat.fits[0] : null;
+    const startPrice = (firstFit && firstFit.price) ? firstFit.price
+                     : (typeof cat.price === 'number' ? cat.price : null);
+
     let thumbs = '';
     for(let i=1; i<=IMAGES_PER_DESIGN; i++){
-      thumbs += `<img src="${base}-${i}.jpg" class="${i===1?'active':''}" onclick="rabkaSwap(this)" onerror="this.style.display='none'">`;
+      thumbs += `<img src="${base}-${i}.jpg" alt="${label} - صورة ${i}" loading="lazy" decoding="async" class="${i===1?'active':''}" onclick="rabkaSwap(this)" onerror="this.style.display='none'">`;
     }
 
     const visual = `
       <div class="card-visual">
-        <img class="main-img" src="${base}-1.jpg" alt="${cat.name}" onerror="this.closest('.card').style.display='none';">
+        <img class="main-img" src="${base}-1.jpg" alt="${label}" loading="lazy" decoding="async" onerror="this.closest('.card').style.display='none';">
       </div>
       <div class="thumb-row">${thumbs}</div>`;
 
     const specsHTML = cat.specs.map(s=>`<li>${s}</li>`).join('');
 
     let bodyExtra = '';
-    let footHTML = '';
-
-    if(cat.type === 'fit-price'){
-      const first = cat.fits[0];
-      const btns = cat.fits.map((f,i)=>
-        `<button type="button" class="fit-btn${i===0?' active':''}" data-price="${f.price}" data-fit="${f.fit}" onclick="rabkaFitClick(this)">${f.fit}</button>`
-      ).join('');
-      bodyExtra = `<div class="fit-select">${btns}</div>`;
-      footHTML = `
-        <span class="price"><span class="lat">EGP</span> <span class="price-num">${first.price}</span></span>
-        <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + ' - ' + first.fit + ' من RABKA')}">اطلب الآن</a>`;
-    } else if(cat.type === 'fit-nopricenote'){
-      const btns = cat.fits.map((f,i)=>
-        `<button type="button" class="fit-btn${i===0?' active':''}" data-fit="${f.fit}" onclick="rabkaFitClick(this)">${f.fit}</button>`
-      ).join('');
-      bodyExtra = `<div class="fit-select">${btns}</div><p class="no-price-note">السعر هيتأكد وقت الطلب</p>`;
-      footHTML = `
-        <span></span>
-        <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + ' - ' + cat.fits[0].fit + ' من RABKA')}">اطلب الآن</a>`;
-    } else if(cat.type === 'sizes-price'){
-      const sizesHTML = cat.sizes.map(s=>`<span>${s}</span>`).join('');
-      bodyExtra = `<div class="sizes">${sizesHTML}</div>`;
-      footHTML = `
-        <span class="price"><span class="lat">EGP</span> ${cat.price}</span>
-        <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + ' من RABKA')}">اطلب الآن</a>`;
-    } else { // sizes-nopricenote
-      const sizesHTML = cat.sizes.map(s=>`<span>${s}</span>`).join('');
-      bodyExtra = `<div class="sizes">${sizesHTML}</div><p class="no-price-note">السعر هيتأكد وقت الطلب</p>`;
-      footHTML = `
-        <span></span>
-        <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + ' من RABKA')}">اطلب الآن</a>`;
+    if(hasFits){
+      bodyExtra += '<div class="fit-select">' + cat.fits.map((f,i)=>
+        `<button type="button" class="fit-btn${i===0?' active':''}" data-price="${f.price||''}" data-fit="${f.fit}" onclick="rabkaFitClick(this)">${f.fit}</button>`
+      ).join('') + '</div>';
+    }
+    if(hasSizes){
+      bodyExtra += '<div class="size-select">' + cat.sizes.map(sz=>
+        `<button type="button" class="size-btn" data-size="${sz}" onclick="rabkaSizeClick(this)">${sz}</button>`
+      ).join('') + '</div><p class="size-hint">اختار المقاس الأول</p>';
+    }
+    if(startPrice === null){
+      bodyExtra += '<p class="no-price-note">السعر هيتأكد وقت الطلب</p>';
     }
 
+    const priceHTML = startPrice !== null
+      ? `<span class="price"><span class="lat">EGP</span> <span class="price-num">${startPrice}</span></span>`
+      : '<span></span>';
+
+    const footHTML = `
+      ${priceHTML}
+      <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + (firstFit ? ' - ' + firstFit.fit : '') + ' من RABKA')}" onclick="return rabkaOrderClick(event, this)">اطلب الآن</a>`;
+
     return `
-      <div class="card" data-base-name="${label}">
+      <div class="card" data-base-name="${label}" data-fit="${firstFit ? firstFit.fit : ''}" data-size="" data-needs-size="${hasSizes}">
         <span class="spec-tag">${tag}</span>
         ${visual}
         <div>
@@ -572,22 +615,70 @@
     });
   });
 
+  // رسالة الواتساب = اسم التصميم + القصّة + المقاس
+  function rabkaMessage(card){
+    const parts = [card.dataset.baseName];
+    if(card.dataset.fit)  parts.push(card.dataset.fit);
+    if(card.dataset.size) parts.push('مقاس ' + card.dataset.size);
+    return parts.join(' - ') + ' من RABKA';
+  }
+  function rabkaRefreshOrder(card){
+    const orderBtn = card.querySelector('.order-btn');
+    if(orderBtn){ orderBtn.href = waLink(rabkaMessage(card)); }
+  }
+
   // fit selector: updates price + whatsapp message per card
   function rabkaFitClick(btn){
     const card = btn.closest('.card');
-    const fitBtns = card.querySelectorAll('.fit-btn');
-    fitBtns.forEach(b=>b.classList.remove('active'));
+    card.querySelectorAll('.fit-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    const fit = btn.dataset.fit || '';
+    card.dataset.fit = btn.dataset.fit || '';
     const price = btn.dataset.price;
     const priceNum = card.querySelector('.price-num');
     if(priceNum && price){ priceNum.textContent = price; }
-    const orderBtn = card.querySelector('.order-btn');
-    const baseName = card.dataset.baseName || '';
-    if(orderBtn){
-      orderBtn.href = waLink(`${baseName} - ${fit} من RABKA`);
-    }
+    rabkaRefreshOrder(card);
   }
+
+  // size selector
+  function rabkaSizeClick(btn){
+    const card = btn.closest('.card');
+    card.querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    card.dataset.size = btn.dataset.size || '';
+    const group = card.querySelector('.size-select');
+    if(group) group.classList.remove('need');
+    rabkaRefreshOrder(card);
+  }
+
+  // لو الصنف ليه مقاسات ومفيش مقاس مختار: منفتحش واتساب ونوضّح للعميل
+  function rabkaOrderClick(e, link){
+    const card = link.closest('.card');
+    if(card && card.dataset.needsSize === 'true' && !card.dataset.size){
+      e.preventDefault();
+      const group = card.querySelector('.size-select');
+      if(group){
+        group.classList.add('need');
+        group.scrollIntoView({ block:'center', behavior:'smooth' });
+      }
+      return false;
+    }
+    return true;
+  }
+
+  // mobile nav
+  (function(){
+    const nav = document.getElementById('mainNav');
+    const toggle = document.getElementById('navToggle');
+    if(!nav || !toggle) return;
+    function setNav(open){
+      nav.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    toggle.addEventListener('click', ()=> setNav(!nav.classList.contains('open')));
+    nav.querySelectorAll('a').forEach(a=> a.addEventListener('click', ()=> setNav(false)));
+    document.addEventListener('keydown', e=>{ if(e.key === 'Escape') setNav(false); });
+    window.addEventListener('resize', ()=>{ if(window.innerWidth > 760) setNav(false); });
+  })();
 
   // gallery thumbnail swap
   function rabkaSwap(thumb){
