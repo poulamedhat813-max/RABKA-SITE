@@ -176,7 +176,7 @@
   /* ---------- products ---------- */
   .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
   @media (max-width:900px){ .grid{ grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
+  @media (max-width:560px){ .grid{ grid-template-columns:repeat(2,1fr); } }
 
   .card{ background:var(--surface); padding:28px 26px 26px; display:flex; flex-direction:column; }
   .card-visual{
@@ -261,6 +261,51 @@
     padding:7px 12px; transition:.15s;
   }
   .fit-btn.active{ border-color:var(--ink); color:var(--ink); background:var(--surface-2); }
+
+
+  /* ---------- موبايل: كروت مضغوطة + صفحة تفاصيل ---------- */
+  .sheet-close, .view-btn{ display:none; }
+  @media (max-width:560px){
+    section{ padding:72px 0; }
+    .grid{ gap:0; background:var(--surface); border:none; border-top:1px solid var(--line); border-inline-end:1px solid var(--line); }
+    .card{ padding:10px 10px 12px; cursor:pointer; position:relative; border-bottom:1px solid var(--line); border-inline-start:1px solid var(--line); }
+    .card:not(.open) .spec-tag{
+      position:absolute; top:16px; left:16px; z-index:2; padding:2px 6px;
+      font-family:'Inter'; direction:ltr; font-size:10px; line-height:1.5; letter-spacing:.08em;
+      background:rgba(6,6,6,.78); color:var(--ink); opacity:1;
+    }
+    .card-visual{ margin-bottom:10px; }
+    .card-visual::before, .card-visual::after{ display:none; }
+
+    /* الكارت المقفول: صورة + اسم + سعر + "عرض" بس */
+    .card:not(.open) .thumb-row,
+    .card:not(.open) .card-desc,
+    .card:not(.open) .card-specs,
+    .card:not(.open) .fit-select,
+    .card:not(.open) .size-select,
+    .card:not(.open) .size-hint,
+    .card:not(.open) .no-price-note,
+    .card:not(.open) .order-btn{ display:none; }
+    .card:not(.open) .card-name{ font-size:17px; line-height:1.2; }
+    .card:not(.open) .card-foot{ margin-top:8px; gap:6px; }
+    .card:not(.open) .price{ font-size:14px; }
+    .card:not(.open) .view-btn{
+      display:inline-flex; align-items:center; margin-inline-start:auto;
+      font-size:12px; font-weight:700; padding:6px 10px; border:1px solid var(--line); color:var(--muted);
+    }
+
+    /* الكارت المفتوح: صفحة كاملة فوق الموقع */
+    .card.open{
+      position:fixed; inset:0; z-index:200; overflow-y:auto; overscroll-behavior:contain;
+      padding:64px 20px 32px; background:var(--bg); cursor:auto;
+    }
+    .card.open .card-visual{ margin-bottom:0; }
+    .card.open .sheet-close{
+      display:flex; position:fixed; top:14px; left:14px; z-index:210;
+      width:40px; height:40px; align-items:center; justify-content:center;
+      background:var(--surface); border:1px solid var(--line); color:var(--ink); font-size:22px; line-height:1;
+    }
+  }
 
   /* ---------- photo cards ---------- */
   .section-sub{ font-family:'Big Shoulders Display'; direction:ltr; text-align:right; font-size:15px; letter-spacing:.04em; color:var(--muted); margin-bottom:16px; text-transform:uppercase; }
@@ -550,10 +595,12 @@
 
     const footHTML = `
       ${priceHTML}
+      <span class="view-btn">عرض</span>
       <a class="order-btn" target="_blank" rel="noopener" href="${waLink(label + (firstFit ? ' - ' + firstFit.fit : '') + ' من RABKA')}" onclick="return rabkaOrderClick(event, this)">اطلب الآن</a>`;
 
     return `
       <div class="card" data-base-name="${label}" data-fit="${firstFit ? firstFit.fit : ''}" data-size="" data-needs-size="${hasSizes}">
+        <button type="button" class="sheet-close" aria-label="إغلاق">×</button>
         <span class="spec-tag">${tag}</span>
         ${visual}
         <div>
@@ -664,6 +711,41 @@
     }
     return true;
   }
+
+  // موبايل: دوس على الكارت يفتح صفحة التفاصيل، والرجوع/×/Esc يقفلها
+  (function(){
+    const mq = window.matchMedia('(max-width:560px)');
+    const products = document.getElementById('products');
+    let opened = null;
+    function openCard(card){
+      opened = card;
+      card.classList.add('open');
+      card.scrollTop = 0;
+      document.body.style.overflow = 'hidden';
+      history.pushState({ rabkaSheet:1 }, '');
+    }
+    function hideCard(){
+      if(!opened) return;
+      opened.classList.remove('open');
+      opened = null;
+      document.body.style.overflow = '';
+    }
+    function closeCard(){
+      if(!opened) return;
+      if(history.state && history.state.rabkaSheet) history.back(); else hideCard();
+    }
+    window.addEventListener('popstate', hideCard);
+    document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeCard(); });
+    mq.addEventListener('change', e=>{ if(!e.matches) hideCard(); });
+    products.addEventListener('click', e=>{
+      const card = e.target.closest('.card');
+      if(!card) return;
+      if(e.target.closest('.sheet-close')){ closeCard(); return; }
+      if(!mq.matches || card.classList.contains('open')) return;
+      if(!card.querySelector('.card-visual')) return;   // كارت Coming Soon
+      openCard(card);
+    });
+  })();
 
   // mobile nav
   (function(){
