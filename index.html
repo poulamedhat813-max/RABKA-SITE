@@ -201,7 +201,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div id="cartList"></div>
   <div id="cartSum" class="sum" hidden>
     <div class="tt"><span>المنتجات</span><b id="cartSub"></b></div>
-    <p class="pol">الشحن بيتحسب في الخطوة الجاية حسب منطقتك.</p>
+    <p class="pol">الشحن بيتحسب في الخطوة الجاية حسب محافظتك ومنطقتك.</p>
     <button class="wa" id="toCo" style="width:100%">إتمام الطلب</button>
   </div>
 </dialog>
@@ -212,7 +212,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <h3>بيانات التوصيل</h3>
     <label class="fl" for="fn">الاسم</label><input class="in" id="fn" autocomplete="name">
     <label class="fl" for="fp">رقم الموبايل</label><input class="in" id="fp" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx">
-    <label class="fl" for="gov">المنطقة / المحافظة</label><select class="in" id="gov"></select>
+    <label class="fl" for="gov">المحافظة</label><select class="in" id="gov"></select>
+    <div id="areaW" hidden><label class="fl" for="area">المنطقة</label><select class="in" id="area"></select></div>
     <label class="fl" for="fa">العنوان بالتفصيل</label><input class="in" id="fa" autocomplete="street-address">
     <label class="fl" for="fnote">ملاحظات (اختياري)</label><input class="in" id="fnote">
     <div class="sum" id="coSum" style="margin-top:14px"></div>
@@ -263,22 +264,24 @@ const INSTAPAY_ADDR = 'pola.demian@instapay';
 // أسعار الأصناف (ناقص: tee, interlock, straight-pants-summer, womens-oversized، ضيف سعرهم هنا)
 const PRICES = {'hoodie':800, 'round':750, 'half-zip':950, 'straight-pants':750};
 const SIZES = ['S','M','L','XL','XXL'];
-// أسعار الشحن حسب المنطقة (من جدول شركة الشحن)
-const ZONES = [
-  {n:'المترو', p:70, t:'24 ساعة', g:['المترو']},
-  {n:'القاهرة والجيزة', p:80, t:'24 ساعة', g:['القاهرة','الجيزة']},
-  {n:'ضواحي القاهرة والجيزة', p:85, t:'24 ساعة', g:['المرج','الخانكة','الخصوص','بدرشين','أكتوبر','التجمع','قطامية','الحوامدية','المقطم','حلوان','حدائق الأهرام','الشيخ زايد','السلام','الرحاب','أبو زعبل','دهشور','أوسيم','ناهيا','المنصورية','كرداسة','البراجيل','أبو رواش','منشأة القناطر','المنيب','أبو النمرس','شبرا منت','سقارة','نكلة']},
-  {n:'المدن الجديدة', p:90, t:'24 ساعة', g:['العبور','مدينتي','مدينة الشروق','بدر','العاشر من رمضان','العياط','الصف','أطفيح','هليوبوليس الجديدة','مدينة المستقبل']},
-  {n:'الإسكندرية والقناة', p:95, t:'24-48 ساعة', g:['الإسكندرية','السويس','الإسماعيلية','بورسعيد']},
-  {n:'الدلتا', p:100, t:'24-48 ساعة', g:['الدقهلية','القليوبية','الغربية','الشرقية','دمياط','كفر الشيخ','البحيرة','المنوفية']},
-  {n:'الصعيد', p:110, t:'24-48 ساعة', g:['الفيوم','بني سويف','أسيوط','سوهاج','قنا','الأقصر','أسوان','المنيا']},
-  {n:'مطروح والساحل والغردقة', p:120, t:'24-48 ساعة', g:['مرسى مطروح','الغردقة','الساحل الشمالي','العلمين','سيدي عبدالرحمن','مدينة الحمام']},
-  {n:'شرم الشيخ', p:135, t:'24-48 ساعة', g:['شرم الشيخ']},
-  {n:'البحر الأحمر وجنوب سيناء', p:140, t:'24-48 ساعة', g:['سفاجا','القصير','رأس غارب','مرسى علم','خليج مكادي','دهب','الطور','جنوب سيناء']},
-  {n:'مناطق بعيدة', p:145, t:'72 ساعة', g:['أبو رديس','أبو زنيمة','نويبع','رأس سدر']}
-];
+// أسعار الشحن (من جدول شركة QP)
+const T1 = '24 ساعة', T2 = '24-48 ساعة';
+const A = (names, p, t) => Object.fromEntries(names.split('،').map(n => [n, [p, t]]));
+// d = سعر المحافظة العادي، a = مناطق ليها سعر مختلف (من جدول شركة الشحن). المحافظات المش مذكورة هنا مش متاحة.
+const GOVS = {
+  'القاهرة': {d:[80,T1], a:{...A('المترو',70,T1), ...A('المرج،المقطم،حلوان،التجمع،قطامية،السلام،الرحاب',85,T1), ...A('مدينتي،مدينة الشروق،بدر،هليوبوليس الجديدة،مدينة المستقبل',90,T1)}},
+  'الجيزة': {d:[80,T1], a:{...A('المترو',70,T1), ...A('بدرشين،أكتوبر،الحوامدية،حدائق الأهرام،الشيخ زايد،دهشور،أوسيم،ناهيا،المنصورية،كرداسة،البراجيل،أبو رواش،منشأة القناطر،المنيب،أبو النمرس،شبرا منت،سقارة،نكلة',85,T1), ...A('العياط،الصف،أطفيح',90,T1)}},
+  'القليوبية': {d:[100,T2], a:{...A('الخانكة،الخصوص،أبو زعبل',85,T1), ...A('العبور',90,T1)}},
+  'الشرقية': {d:[100,T2], a:A('العاشر من رمضان',90,T1)},
+  'الإسكندرية': {d:[95,T2]}, 'السويس': {d:[95,T2]}, 'الإسماعيلية': {d:[95,T2]}, 'بورسعيد': {d:[95,T2]},
+  'الدقهلية': {d:[100,T2]}, 'الغربية': {d:[100,T2]}, 'دمياط': {d:[100,T2]}, 'كفر الشيخ': {d:[100,T2]}, 'البحيرة': {d:[100,T2]}, 'المنوفية': {d:[100,T2]},
+  'الفيوم': {d:[110,T2]}, 'بني سويف': {d:[110,T2]}, 'المنيا': {d:[110,T2]}, 'أسيوط': {d:[110,T2]}, 'سوهاج': {d:[110,T2]}, 'قنا': {d:[110,T2]}, 'الأقصر': {d:[110,T2]}, 'أسوان': {d:[110,T2]},
+  'مطروح': {a:A('مرسى مطروح،الساحل الشمالي،العلمين،سيدي عبدالرحمن،مدينة الحمام',120,T2)},
+  'البحر الأحمر': {a:{...A('الغردقة',120,T2), ...A('سفاجا،القصير،رأس غارب،مرسى علم،خليج مكادي',140,T2)}},
+  'جنوب سيناء': {a:{...A('شرم الشيخ',135,T2), ...A('دهب،الطور',140,T2), ...A('نويبع،أبو رديس،أبو زنيمة،رأس سدر',145,'72 ساعة')}}
+};
 const CATS = [
-  ['hoodie','هودي'],['round','راوند'],['straight-pants','بنطلون شتوي'],['half-zip','هاف زيب'],
+  ['hoodie','Hoodie'],['round','Round'],['straight-pants','Sweatpants'],['half-zip','Zipper'],
   ['tee','تيشيرت صيفي'],['interlock','إنترلوك بوكس فيت'],['straight-pants-summer','بنطلون صيفي'],['womens-oversized','أوفر سايز حريمي']
 ];
 const label = id => (CATS.find(c => c[0] === id) || [id, id])[1];
@@ -322,15 +325,15 @@ function render(){
         <img src="${img(x.c, x.n, 1)}" alt="${label(x.c)} تصميم ${x.n}" loading="lazy">
         <img class="b" src="${img(x.c, x.n, 2)}" alt="" loading="lazy" onerror="this.remove()">
       </div>
-      <div class="n">${label(x.c)} — ${x.n}</div>${PRICES[x.c] ? `<div class="c">${money(PRICES[x.c])}</div>` : ''}
+      <div class="n">${label(x.c)} ${x.n}</div>${PRICES[x.c] ? `<div class="c">${money(PRICES[x.c])}</div>` : ''}
     </button>`).join('') : '<div class="empty" style="grid-column:1/-1">مفيش تصاميم في الصنف ده لسه.</div>';
   $('pg').innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
     `<button class="${i + 1 === page ? 'on' : ''}" data-p="${i + 1}">${i + 1}</button>`).join('') : '';
 }
 
 function openDesign(c, n){
-  $('dT').textContent = label(c) + ' — تصميم ' + n;
-  $('dC').textContent = label(c);
+  $('dT').textContent = label(c) + ' ' + n;
+  $('dC').textContent = 'تصميم رقم ' + n;
   cur = {c, n}; size = ''; $('dN').textContent = '';
   const pr = PRICES[c];
   $('dP').textContent = pr ? money(pr) : '';
@@ -385,8 +388,8 @@ let cart = [], cur = null, size = '', ord = null;
 try{ cart = JSON.parse(localStorage.getItem('rb_cart') || '[]'); }catch(_){}
 const money = v => v.toLocaleString('en-US') + ' جنيه';
 const sub = () => cart.reduce((a, x) => a + (PRICES[x.c] || 0) * x.q, 0);
-const zoneOf = g => ZONES.find(z => z.g.includes(g));
-const shipOf = g => { const z = zoneOf(g); return z ? z.p : null; };
+const priceOf = (g, a) => { const o = GOVS[g]; if(!o) return null; return (a && o.a && o.a[a]) || o.d || null; };
+const shipOf = (g, a) => { const r = priceOf(g, a); return r ? r[0] : null; };
 function updateCart(){
   cart = cart.filter(x => PRICES[x.c]);
   $('cartN').textContent = cart.reduce((a, x) => a + x.q, 0);
@@ -394,18 +397,18 @@ function updateCart(){
   const el = $('cartList');
   $('cartSum').hidden = !cart.length;
   if(!cart.length){ el.innerHTML = '<div class="empty">السلة فاضية.</div>'; return; }
-  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} — ${x.n}</b><small>المقاس ${x.s} · ${money(PRICES[x.c])}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
+  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} ${x.n}</b><small>المقاس ${x.s} · ${money(PRICES[x.c])}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
   $('cartSub').textContent = money(sub());
 }
 function sumHTML(){
-  const s = sub(), g = shipOf($('gov').value), z = zoneOf($('gov').value);
-  return `<div><span>المنتجات</span><b>${money(s)}</b></div><div><span>الشحن</span><b>${g == null ? 'اختار المنطقة' : money(g)}</b></div>` +
-    (z ? `<div><span>مدة التوصيل</span><b>${z.t}</b></div>` : '') +
+  const s = sub(), r = priceOf($('gov').value, $('area').value), g = r ? r[0] : null;
+  return `<div><span>المنتجات</span><b>${money(s)}</b></div><div><span>الشحن</span><b>${g == null ? 'اختار المحافظة والمنطقة' : money(g)}</b></div>` +
+    (r ? `<div><span>مدة التوصيل</span><b>${r[1]}</b></div>` : '') +
     `<div class="tt"><span>الإجمالي</span><b>${g == null ? '—' : money(s + g)}</b></div>`;
 }
 function step(n){ [1, 2, 3].forEach(i => $('s' + i).hidden = i !== n); $('coDlg').scrollTop = 0; }
 function orderText(){
-  return `طلب جديد ${ord.id}\nالاسم: ${ord.name}\nالموبايل: ${ord.phone}\nالمنطقة: ${ord.gov}\nالعنوان: ${ord.addr}\n` +
+  return `طلب جديد ${ord.id}\nالاسم: ${ord.name}\nالموبايل: ${ord.phone}\nالمحافظة: ${ord.gov}\nالمنطقة: ${ord.area || '-'}\nالعنوان: ${ord.addr}\n` +
     (ord.note ? `ملاحظات: ${ord.note}\n` : '') + '\n' +
     ord.items.map(x => `- ${label(x.c)} تصميم ${x.n} | مقاس ${x.s} | عدد ${x.q}`).join('\n') +
     `\n\nالمنتجات: ${ord.sub} | الشحن: ${ord.ship} | الإجمالي: ${ord.total} جنيه\nالدفع: InstaPay (صورة التحويل مرفقة)`;
@@ -428,18 +431,32 @@ $('add').onclick = () => {
   f ? f.q++ : cart.push({c: cur.c, n: cur.n, s: size, q: 1});
   updateCart(); $('dlg').close(); $('cartDlg').showModal();
 };
-$('gov').innerHTML = '<option value="">اختار المنطقة</option>' + ZONES.map(z => `<optgroup label="${z.n}">${z.g.map(g => `<option>${g}</option>`).join('')}</optgroup>`).join('');
-$('gov').addEventListener('change', () => { $('coSum').innerHTML = sumHTML(); });
-$('shipT').innerHTML = ZONES.map(z => `<div><b>${z.n}</b><span>${money(z.p)} · ${z.t}</span><br><small>${z.g.join('، ')}</small></div>`).join('') + '<div><b>منطقتك مش في القايمة؟</b><small>كلمنا على انستجرام ونحسبلك الشحن.</small></div>';
+$('gov').innerHTML = '<option value="">اختار المحافظة</option>' + Object.keys(GOVS).map(g => `<option>${g}</option>`).join('');
+$('gov').addEventListener('change', () => {
+  const o = GOVS[$('gov').value];
+  $('areaW').hidden = !(o && o.a);
+  $('area').innerHTML = (o && o.a) ? (o.d ? `<option value="">باقي ${$('gov').value}</option>` : '<option value="">اختار المنطقة</option>') + Object.keys(o.a).map(a => `<option>${a}</option>`).join('') : '';
+  $('coSum').innerHTML = sumHTML();
+});
+$('area').addEventListener('change', () => { $('coSum').innerHTML = sumHTML(); });
+(() => {
+  const m = {};
+  Object.entries(GOVS).forEach(([g, o]) => {
+    if(o.d) (m[o.d.join('|')] = m[o.d.join('|')] || new Set()).add(g);
+    Object.entries(o.a || {}).forEach(([a, r]) => (m[r.join('|')] = m[r.join('|')] || new Set()).add(a));
+  });
+  $('shipT').innerHTML = Object.keys(m).sort((a, b) => parseInt(a) - parseInt(b)).map(k => { const [p, t] = k.split('|'); return `<div><b>${money(+p)} · ${t}</b><small>${[...m[k]].join('، ')}</small></div>`; }).join('') +
+    '<div><b>منطقتك مش في القايمة؟</b><small>كلمنا على انستجرام ونحسبلك الشحن.</small></div>';
+})();
 $('toCo').onclick = () => { $('cartDlg').close(); step(1); $('coErr').textContent = ''; $('coSum').innerHTML = sumHTML(); $('coDlg').showModal(); };
 $('toPay').onclick = () => {
   const ar = '٠١٢٣٤٥٦٧٨٩';
   const phone = $('fp').value.trim().replace(/[٠-٩]/g, d => ar.indexOf(d));
-  const v = {name: $('fn').value.trim(), phone, gov: $('gov').value, addr: $('fa').value.trim(), note: $('fnote').value.trim()};
+  const v = {name: $('fn').value.trim(), phone, gov: $('gov').value, area: $('area').value, addr: $('fa').value.trim(), note: $('fnote').value.trim()};
   const bad = v.name.length < 3 ? 'اكتب اسمك.' : !/^01[0125]\d{8}$/.test(phone) ? 'رقم الموبايل لازم يكون 11 رقم ويبدأ بـ 01.' :
-    !v.gov ? 'اختار المنطقة.' : v.addr.length < 8 ? 'اكتب العنوان بالتفصيل.' : !$('agree').checked ? 'لازم توافق على سياسة الشحن وعدم الاستبدال.' : '';
+    !v.gov ? 'اختار المحافظة.' : priceOf(v.gov, v.area) == null ? 'اختار المنطقة.' : v.addr.length < 8 ? 'اكتب العنوان بالتفصيل.' : !$('agree').checked ? 'لازم توافق على سياسة الشحن وعدم الاستبدال.' : '';
   if(bad){ $('coErr').textContent = bad; return; }
-  const s = sub(), sh = shipOf(v.gov);
+  const s = sub(), sh = shipOf(v.gov, v.area);
   ord = {...v, id: 'RB-' + Date.now().toString(36).slice(-6).toUpperCase(), items: cart.map(x => ({...x})), sub: s, ship: sh, total: s + sh};
   $('payAmt').textContent = money(ord.total);
   $('ipLink').href = INSTAPAY_LINK; $('ipAddr').textContent = INSTAPAY_ADDR;
