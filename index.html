@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RABKA | ملابس رجالي وحريمي</title>
 <meta name="description" content="تشكيلة RABKA: هودي، راوند، تيشيرتات، بناطيل وأكتر. تصاميم جديدة كل أسبوع.">
+<link rel="icon" href="favicon.png" type="image/png">
+<meta property="og:title" content="RABKA"><meta property="og:image" content="og.jpg"><meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -108,6 +110,30 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .wa{display:inline-block;margin-top:18px;padding:13px 22px;background:var(--accent);color:var(--on-accent);font-weight:700;text-align:center}
 .x{position:absolute;top:8px;inset-inline-end:8px;width:40px;height:40px;font-size:22px;background:var(--bg);border:1px solid var(--line);z-index:2}
 .gal{padding:14px}
+[hidden]{display:none!important}
+.logo img{height:40px;width:auto}
+@media (prefers-color-scheme: dark){.logo img{filter:invert(1)}}
+.cartb{border:1px solid var(--ink);padding:7px 14px;font-weight:700;white-space:nowrap}
+.pr{font-size:22px;font-weight:700;color:var(--ink)!important}
+.wa{border:0;font:inherit;cursor:pointer}
+#cartDlg,#coDlg{width:min(520px,96vw);padding:22px;overflow:auto}
+#cartDlg h3,#coDlg h3{font-size:20px;font-weight:900;margin-bottom:14px}
+.ci{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ci img{width:64px;aspect-ratio:2/3;object-fit:cover;background:var(--soft)}
+.ct{display:flex;flex-direction:column;gap:4px;flex:1}.ct small{color:var(--muted)}
+.q{display:flex;gap:8px;align-items:center}.q button{width:30px;height:30px;border:1px solid var(--line)}
+.q .rmv{width:auto;padding:0 10px;margin-inline-start:auto;color:var(--badge)}
+.sum div{display:flex;justify-content:space-between;padding:5px 0}.sum .tt{font-weight:900;font-size:18px;border-top:1px solid var(--line);margin-top:6px;padding-top:10px}
+.fl{display:block;margin:10px 0 4px;font-size:14px;color:var(--muted)}
+.in{width:100%;background:var(--bg);color:var(--ink);border:1px solid var(--line);padding:11px;font:inherit}
+.err{color:var(--badge);font-size:14px;min-height:20px;margin-top:8px}
+.chk{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:14px}
+.pol{background:var(--soft);padding:12px 14px;font-size:14px;margin:12px 0;color:var(--muted)}
+.qr{display:block;margin:12px auto;width:220px;background:#fff}
+.box{background:var(--soft);padding:12px;font-size:13px;white-space:pre-wrap;max-height:180px;overflow:auto;margin:10px 0;width:100%;border:0;color:var(--ink);font-family:inherit}
+.big{font-size:30px;font-weight:900}
+.ship{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
+.ship div{border:1px solid var(--line);padding:14px}.ship b{display:block}.ship small{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -115,8 +141,9 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 <div class="top">تصاميم جديدة بتتضاف كل أسبوع</div>
 <header>
   <div class="w bar">
-    <a class="logo" href="#" aria-label="RABKA">RABKA</a>
+    <a class="logo" href="#" aria-label="RABKA"><img src="logo.png" alt="RABKA"></a>
     <nav id="nav" aria-label="الأصناف"></nav>
+    <button class="cartb" id="cartBtn">السلة (<span id="cartN">0</span>)</button>
   </div>
 </header>
 
@@ -151,17 +178,67 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
   <div class="perks">
     <div><b>تصاميم جديدة</b><span>بنضيف موديلات كل أسبوع</span></div>
-    <div><b>اطلب بسهولة</b><span>اختار التصميم وكمّل الطلب في رسالة على انستجرام</span></div>
+    <div><b>دفع بإنستا باي</b><span>أضف للسلة وادفع بإنستا باي وأكّد طلبك</span></div>
     <div><b>خامات مريحة</b><span>قصّات عملية للاستخدام اليومي</span></div>
   </div>
+<section id="info">
+    <div class="sh"><h2>الشحن والسياسات</h2></div>
+    <div class="ship" id="shipT"></div>
+    <div class="pol" style="margin-top:14px">مفيش استبدال ولا استرجاع، لأننا بنراجع كل قطعة قبل ما توصلك. الاستثناء الوحيد لو الغلط مننا (قطعة غلط أو فيها عيب)، وساعتها بنحلها معاك على انستجرام.</div>
+  </section>
 </main>
 
 <footer>
   <div class="w f">
-    <div><b style="color:var(--ink);font-size:20px;letter-spacing:.06em">RABKA</b><p>ملابس بتصاميم مختارة.</p></div>
+    <div><b style="color:var(--ink);font-size:20px;letter-spacing:.06em">RABKA</b><p>ملابس بتصاميم مختارة.</p><a href="https://www.instagram.com/rabka_eg" target="_blank" rel="noopener">انستجرام @rabka_eg</a></div>
     <div id="fnav"></div>
   </div>
 </footer>
+
+<dialog id="cartDlg" aria-label="السلة">
+  <button class="x" data-close aria-label="إغلاق">×</button>
+  <h3>السلة</h3>
+  <div id="cartList"></div>
+  <div id="cartSum" class="sum" hidden>
+    <div class="tt"><span>المنتجات</span><b id="cartSub"></b></div>
+    <p class="pol">الشحن بيتحسب في الخطوة الجاية حسب منطقتك.</p>
+    <button class="wa" id="toCo" style="width:100%">إتمام الطلب</button>
+  </div>
+</dialog>
+
+<dialog id="coDlg" aria-label="إتمام الطلب">
+  <button class="x" data-close aria-label="إغلاق">×</button>
+  <div id="s1">
+    <h3>بيانات التوصيل</h3>
+    <label class="fl" for="fn">الاسم</label><input class="in" id="fn" autocomplete="name">
+    <label class="fl" for="fp">رقم الموبايل</label><input class="in" id="fp" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx">
+    <label class="fl" for="gov">المنطقة / المحافظة</label><select class="in" id="gov"></select>
+    <label class="fl" for="fa">العنوان بالتفصيل</label><input class="in" id="fa" autocomplete="street-address">
+    <label class="fl" for="fnote">ملاحظات (اختياري)</label><input class="in" id="fnote">
+    <div class="sum" id="coSum" style="margin-top:14px"></div>
+    <div class="pol">مفيش استبدال ولا استرجاع إلا لو الغلط مننا.</div>
+    <label class="chk"><input type="checkbox" id="agree"> قرأت سياسة الشحن وعدم الاستبدال وموافق عليها</label>
+    <div class="err" id="coErr"></div>
+    <button class="wa" id="toPay" style="width:100%">التالي: الدفع</button>
+  </div>
+  <div id="s2" hidden>
+    <h3>الدفع عن طريق InstaPay</h3>
+    <p>حوّل المبلغ ده بالظبط:</p><p class="big" id="payAmt"></p>
+    <a class="wa" id="ipLink" target="_blank" rel="noopener" style="width:100%">افتح InstaPay وحوّل</a>
+    <p style="margin-top:10px">أو حوّل على العنوان: <b id="ipAddr"></b></p>
+    <img class="qr" src="instapay-qr.jpg" alt="كود InstaPay">
+    <div class="pol">بعد التحويل خد سكرين شوت للإيصال، هتبعته على انستجرام في الخطوة الجاية.</div>
+    <button class="wa" id="confirm" style="width:100%">حوّلت المبلغ، أكّد الطلب</button>
+    <button class="chip" id="back" style="margin-top:10px">رجوع</button>
+  </div>
+  <div id="s3" hidden>
+    <h3>تم تسجيل طلبك</h3>
+    <p>رقم الطلب: <b id="oid"></b></p>
+    <p class="pol">طلبك بيتأكد أول ما نستلم رسالتك وصورة التحويل على انستجرام. ابعتهم دلوقتي:</p>
+    <textarea class="box" id="otext" readonly rows="8"></textarea>
+    <a class="wa" id="sendIg" target="_blank" rel="noopener" style="width:100%">انسخ الطلب وافتح انستجرام</a>
+  </div>
+</dialog>
 
 <dialog id="dlg" aria-label="تفاصيل التصميم">
   <button class="x" id="close" aria-label="إغلاق">×</button>
@@ -169,15 +246,37 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
     <div class="gal"><div class="main"><img id="mainImg" alt=""></div><div class="thumbs" id="thumbs"></div></div>
     <div class="info">
       <h3 id="dT"></h3><p id="dC"></p>
-      <a class="wa" id="wa" target="_blank" rel="noopener" hidden>اطلب من انستجرام</a>
-      <p id="waNote" style="font-size:13px" hidden>هننسخلك اسم التصميم، الصقه في رسالتك على انستجرام.</p>
+      <p class="pr" id="dP"></p>
+      <div class="chips" id="sizes" role="group" aria-label="المقاس"></div>
+      <button class="wa" id="add">أضف للسلة</button>
+      <a class="wa" id="ask" target="_blank" rel="noopener" hidden>اسأل عن السعر على انستجرام</a>
+      <p id="dN" class="err"></p>
     </div>
   </div>
 </dialog>
 
 <script>
-// اسم حسابك على انستجرام من غير @ (مثال: rabka.eg). الطلب بيتم من هناك بس.
-const INSTAGRAM = '';
+// ===== إعدادات (عدّل من هنا بس) =====
+const INSTAGRAM = 'rabka_eg';
+const INSTAPAY_LINK = 'https://ipn.eg/S/pola.demian/instapay/5DR8yG';
+const INSTAPAY_ADDR = 'pola.demian@instapay';
+// أسعار الأصناف (ناقص: tee, interlock, straight-pants-summer, womens-oversized، ضيف سعرهم هنا)
+const PRICES = {'hoodie':800, 'round':750, 'half-zip':950, 'straight-pants':750};
+const SIZES = ['S','M','L','XL','XXL'];
+// أسعار الشحن حسب المنطقة (من جدول شركة الشحن)
+const ZONES = [
+  {n:'المترو', p:70, t:'24 ساعة', g:['المترو']},
+  {n:'القاهرة والجيزة', p:80, t:'24 ساعة', g:['القاهرة','الجيزة']},
+  {n:'ضواحي القاهرة والجيزة', p:85, t:'24 ساعة', g:['المرج','الخانكة','الخصوص','بدرشين','أكتوبر','التجمع','قطامية','الحوامدية','المقطم','حلوان','حدائق الأهرام','الشيخ زايد','السلام','الرحاب','أبو زعبل','دهشور','أوسيم','ناهيا','المنصورية','كرداسة','البراجيل','أبو رواش','منشأة القناطر','المنيب','أبو النمرس','شبرا منت','سقارة','نكلة']},
+  {n:'المدن الجديدة', p:90, t:'24 ساعة', g:['العبور','مدينتي','مدينة الشروق','بدر','العاشر من رمضان','العياط','الصف','أطفيح','هليوبوليس الجديدة','مدينة المستقبل']},
+  {n:'الإسكندرية والقناة', p:95, t:'24-48 ساعة', g:['الإسكندرية','السويس','الإسماعيلية','بورسعيد']},
+  {n:'الدلتا', p:100, t:'24-48 ساعة', g:['الدقهلية','القليوبية','الغربية','الشرقية','دمياط','كفر الشيخ','البحيرة','المنوفية']},
+  {n:'الصعيد', p:110, t:'24-48 ساعة', g:['الفيوم','بني سويف','أسيوط','سوهاج','قنا','الأقصر','أسوان','المنيا']},
+  {n:'مطروح والساحل والغردقة', p:120, t:'24-48 ساعة', g:['مرسى مطروح','الغردقة','الساحل الشمالي','العلمين','سيدي عبدالرحمن','مدينة الحمام']},
+  {n:'شرم الشيخ', p:135, t:'24-48 ساعة', g:['شرم الشيخ']},
+  {n:'البحر الأحمر وجنوب سيناء', p:140, t:'24-48 ساعة', g:['سفاجا','القصير','رأس غارب','مرسى علم','خليج مكادي','دهب','الطور','جنوب سيناء']},
+  {n:'مناطق بعيدة', p:145, t:'72 ساعة', g:['أبو رديس','أبو زنيمة','نويبع','رأس سدر']}
+];
 const CATS = [
   ['hoodie','هودي'],['round','راوند'],['straight-pants','بنطلون شتوي'],['half-zip','هاف زيب'],
   ['tee','تيشيرت صيفي'],['interlock','إنترلوك بوكس فيت'],['straight-pants-summer','بنطلون صيفي'],['womens-oversized','أوفر سايز حريمي']
@@ -223,7 +322,7 @@ function render(){
         <img src="${img(x.c, x.n, 1)}" alt="${label(x.c)} تصميم ${x.n}" loading="lazy">
         <img class="b" src="${img(x.c, x.n, 2)}" alt="" loading="lazy" onerror="this.remove()">
       </div>
-      <div class="n">${label(x.c)} — ${x.n}</div>
+      <div class="n">${label(x.c)} — ${x.n}</div>${PRICES[x.c] ? `<div class="c">${money(PRICES[x.c])}</div>` : ''}
     </button>`).join('') : '<div class="empty" style="grid-column:1/-1">مفيش تصاميم في الصنف ده لسه.</div>';
   $('pg').innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
     `<button class="${i + 1 === page ? 'on' : ''}" data-p="${i + 1}">${i + 1}</button>`).join('') : '';
@@ -232,14 +331,12 @@ function render(){
 function openDesign(c, n){
   $('dT').textContent = label(c) + ' — تصميم ' + n;
   $('dC').textContent = label(c);
-  const wa = $('wa');
-  if(INSTAGRAM){
-    const msg = `عايز أطلب ${label(c)} تصميم رقم ${n}`;
-    wa.hidden = false; $('waNote').hidden = false;
-    wa.href = `https://ig.me/m/${INSTAGRAM}`;
-    // انستجرام مبيقبلش رسالة جاهزة في الرابط، فبننسخها للحافظة
-    wa.onclick = () => { try{ navigator.clipboard.writeText(msg); }catch(_){} };
-  }
+  cur = {c, n}; size = ''; $('dN').textContent = '';
+  const pr = PRICES[c];
+  $('dP').textContent = pr ? money(pr) : '';
+  $('sizes').hidden = $('add').hidden = !pr; $('ask').hidden = !!pr;
+  $('ask').href = 'https://ig.me/m/' + INSTAGRAM;
+  $('sizes').innerHTML = SIZES.map(z => `<button class="chip" data-s="${z}">${z}</button>`).join('');
   const th = $('thumbs'); th.innerHTML = '';
   $('mainImg').src = img(c, n, 1);
   for(let i = 1; i <= MAXIMG; i++){
@@ -281,6 +378,81 @@ document.addEventListener('click', e => {
 $('sort').addEventListener('change', e => { sort = e.target.value; page = 1; render(); });
 $('close').addEventListener('click', () => $('dlg').close());
 $('dlg').addEventListener('click', e => { if(e.target === $('dlg')) $('dlg').close(); });
+
+
+// ===== السلة والطلب =====
+let cart = [], cur = null, size = '', ord = null;
+try{ cart = JSON.parse(localStorage.getItem('rb_cart') || '[]'); }catch(_){}
+const money = v => v.toLocaleString('en-US') + ' جنيه';
+const sub = () => cart.reduce((a, x) => a + (PRICES[x.c] || 0) * x.q, 0);
+const zoneOf = g => ZONES.find(z => z.g.includes(g));
+const shipOf = g => { const z = zoneOf(g); return z ? z.p : null; };
+function updateCart(){
+  cart = cart.filter(x => PRICES[x.c]);
+  $('cartN').textContent = cart.reduce((a, x) => a + x.q, 0);
+  try{ localStorage.setItem('rb_cart', JSON.stringify(cart)); }catch(_){}
+  const el = $('cartList');
+  $('cartSum').hidden = !cart.length;
+  if(!cart.length){ el.innerHTML = '<div class="empty">السلة فاضية.</div>'; return; }
+  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} — ${x.n}</b><small>المقاس ${x.s} · ${money(PRICES[x.c])}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
+  $('cartSub').textContent = money(sub());
+}
+function sumHTML(){
+  const s = sub(), g = shipOf($('gov').value), z = zoneOf($('gov').value);
+  return `<div><span>المنتجات</span><b>${money(s)}</b></div><div><span>الشحن</span><b>${g == null ? 'اختار المنطقة' : money(g)}</b></div>` +
+    (z ? `<div><span>مدة التوصيل</span><b>${z.t}</b></div>` : '') +
+    `<div class="tt"><span>الإجمالي</span><b>${g == null ? '—' : money(s + g)}</b></div>`;
+}
+function step(n){ [1, 2, 3].forEach(i => $('s' + i).hidden = i !== n); $('coDlg').scrollTop = 0; }
+function orderText(){
+  return `طلب جديد ${ord.id}\nالاسم: ${ord.name}\nالموبايل: ${ord.phone}\nالمنطقة: ${ord.gov}\nالعنوان: ${ord.addr}\n` +
+    (ord.note ? `ملاحظات: ${ord.note}\n` : '') + '\n' +
+    ord.items.map(x => `- ${label(x.c)} تصميم ${x.n} | مقاس ${x.s} | عدد ${x.q}`).join('\n') +
+    `\n\nالمنتجات: ${ord.sub} | الشحن: ${ord.ship} | الإجمالي: ${ord.total} جنيه\nالدفع: InstaPay (صورة التحويل مرفقة)`;
+}
+document.addEventListener('click', e => {
+  const q = e.target.closest('[data-q]');
+  if(q){ const [i, d] = q.dataset.q.split(':').map(Number); cart[i].q += d; if(cart[i].q < 1) cart.splice(i, 1); updateCart(); return; }
+  const r = e.target.closest('[data-rm]');
+  if(r){ cart.splice(+r.dataset.rm, 1); updateCart(); return; }
+  const z = e.target.closest('[data-s]');
+  if(z){ size = z.dataset.s; $('dN').textContent = ''; $('sizes').querySelectorAll('button').forEach(b => b.classList.toggle('on', b === z)); return; }
+  const cl = e.target.closest('[data-close]');
+  if(cl) cl.closest('dialog').close();
+});
+['cartDlg', 'coDlg'].forEach(id => $(id).addEventListener('click', e => { if(e.target === $(id)) $(id).close(); }));
+$('cartBtn').onclick = () => { updateCart(); $('cartDlg').showModal(); };
+$('add').onclick = () => {
+  if(!size){ $('dN').textContent = 'اختار المقاس الأول.'; return; }
+  const f = cart.find(x => x.c === cur.c && x.n === cur.n && x.s === size);
+  f ? f.q++ : cart.push({c: cur.c, n: cur.n, s: size, q: 1});
+  updateCart(); $('dlg').close(); $('cartDlg').showModal();
+};
+$('gov').innerHTML = '<option value="">اختار المنطقة</option>' + ZONES.map(z => `<optgroup label="${z.n}">${z.g.map(g => `<option>${g}</option>`).join('')}</optgroup>`).join('');
+$('gov').addEventListener('change', () => { $('coSum').innerHTML = sumHTML(); });
+$('shipT').innerHTML = ZONES.map(z => `<div><b>${z.n}</b><span>${money(z.p)} · ${z.t}</span><br><small>${z.g.join('، ')}</small></div>`).join('') + '<div><b>منطقتك مش في القايمة؟</b><small>كلمنا على انستجرام ونحسبلك الشحن.</small></div>';
+$('toCo').onclick = () => { $('cartDlg').close(); step(1); $('coErr').textContent = ''; $('coSum').innerHTML = sumHTML(); $('coDlg').showModal(); };
+$('toPay').onclick = () => {
+  const ar = '٠١٢٣٤٥٦٧٨٩';
+  const phone = $('fp').value.trim().replace(/[٠-٩]/g, d => ar.indexOf(d));
+  const v = {name: $('fn').value.trim(), phone, gov: $('gov').value, addr: $('fa').value.trim(), note: $('fnote').value.trim()};
+  const bad = v.name.length < 3 ? 'اكتب اسمك.' : !/^01[0125]\d{8}$/.test(phone) ? 'رقم الموبايل لازم يكون 11 رقم ويبدأ بـ 01.' :
+    !v.gov ? 'اختار المنطقة.' : v.addr.length < 8 ? 'اكتب العنوان بالتفصيل.' : !$('agree').checked ? 'لازم توافق على سياسة الشحن وعدم الاستبدال.' : '';
+  if(bad){ $('coErr').textContent = bad; return; }
+  const s = sub(), sh = shipOf(v.gov);
+  ord = {...v, id: 'RB-' + Date.now().toString(36).slice(-6).toUpperCase(), items: cart.map(x => ({...x})), sub: s, ship: sh, total: s + sh};
+  $('payAmt').textContent = money(ord.total);
+  $('ipLink').href = INSTAPAY_LINK; $('ipAddr').textContent = INSTAPAY_ADDR;
+  step(2);
+};
+$('back').onclick = () => step(1);
+$('confirm').onclick = () => {
+  $('oid').textContent = ord.id; $('otext').value = orderText();
+  $('sendIg').href = 'https://ig.me/m/' + INSTAGRAM;
+  cart = []; updateCart(); step(3);
+};
+$('sendIg').onclick = () => { try{ navigator.clipboard.writeText($('otext').value); }catch(_){} };
+updateCart();
 
 fetch('designs.json', {cache: 'no-store'})
   .then(r => r.ok ? r.json() : {})
