@@ -136,6 +136,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .ship div{border:1px solid var(--line);padding:14px}.ship b{display:block}.ship small{color:var(--muted)}
 details{margin-top:12px;font-size:14px}summary{cursor:pointer;font-weight:700}
 .ct2{width:100%;border-collapse:collapse;margin:8px 0;text-align:center}.ct2 th,.ct2 td{border:1px solid var(--line);padding:6px}.ct2 caption{text-align:start;font-weight:700;padding:6px 0}
+.sw{display:inline-block;width:14px;height:14px;border-radius:50%;border:1px solid var(--line);margin-inline-end:6px;vertical-align:-2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -185,6 +186,7 @@ details{margin-top:12px;font-size:14px}summary{cursor:pointer;font-weight:700}
   </div>
 <section id="info">
     <div class="sh"><h2>الشحن والسياسات</h2></div>
+    <p class="pol" id="prodP"></p>
     <div class="ship" id="shipT"></div>
     <div class="pol" style="margin-top:14px">مفيش استبدال ولا استرجاع، لأننا بنراجع كل قطعة قبل ما توصلك. الاستثناء الوحيد لو الغلط مننا (قطعة غلط أو فيها عيب)، وساعتها بنحلها معاك على انستجرام.</div>
   </section>
@@ -253,6 +255,7 @@ details{margin-top:12px;font-size:14px}summary{cursor:pointer;font-weight:700}
       <p class="pr" id="dP"></p>
       <div class="chips" id="sizes" role="group" aria-label="المقاس"></div>
       <details id="chart" hidden><summary>جدول المقاسات</summary><div id="chartBody"></div></details>
+      <div id="colorW"><div id="fitW" hidden><label class="fl">القصّة</label><div class="chips" id="fits"></div></div><label class="fl">اللون</label><div class="chips" id="colors"></div><small id="prodN" style="color:var(--muted);display:block;margin-top:8px"></small></div>
       <button class="wa" id="add">أضف للسلة</button>
       <a class="wa" id="ask" target="_blank" rel="noopener" hidden>اسأل عن السعر على انستجرام</a>
       <p id="dN" class="err"></p>
@@ -268,12 +271,17 @@ const INSTAPAY_ADDR = 'pola.demian@instapay';
 // أسعار الأصناف (ناقص: tee, interlock, straight-pants-summer, womens-oversized، ضيف سعرهم هنا)
 const PRICES = {'hoodie':800, 'round':750, 'half-zip':950, 'straight-pants':750};
 const SIZES = ['M','L','XL','XXL'];
+const PROD_DAYS = 5; // مدة التجهيز قبل الشحن (بالأيام)
+// الألوان المتاحة (الاسم، لون الدايرة). عدّل أو ضيف زي ما تحب.
+const COLORS = [['ابيض','#ffffff'],['اسود','#111111'],['بني','#6b4a35'],['بيج','#d8c3a5'],['حديدي','#4a4f55'],['زيتي','#5b5d2e'],['موف فاتح','#c3a6e0'],['بيبي بلو','#a8d0ee'],['جراي فاتح','#c9c9c9'],['مينت جرين','#a8e6cf'],['نبيتي','#6d1b2f'],['شانيه','#e6d3b0'],['فراني','']];
+const COLOR_ONLY = {'half-zip': ['اسود','شانيه']}; // أصناف ألوانها محدودة
+const FITS = {hoodie: ['Over','Boxy'], round: ['Over','Boxy'], 'half-zip': ['Boxy']};
 // إشعار الطلبات على تليجرام (بيوصلك على الموبايل مع صور القطع). سيبهم فاضيين لو لسه معملتهمش.
 const TG_TOKEN = '9022300993:AAH6uyFkcgpnYqMwyEU0qYLojhEssB-NNc4';
 const TG_CHAT = '2019563199';
 // جداول المقاسات بالسم: الطول ثم العرض
 const FIT = [['Over',[72,74,76,77],[60,62,64,66]], ['Boxy',[60,62,64,66],[68,69,70,71]]];
-const CHARTS = {hoodie: FIT, round: FIT};
+const CHARTS = {hoodie: FIT, round: FIT, 'half-zip': [FIT[1]]};
 function renderChart(c){
   const f = CHARTS[c]; $('chart').hidden = !f; if(!f) return; $('chart').open = false;
   const row = (t, a) => `<tr><th>${t}</th>${a.map(v => `<td>${v}</td>`).join('')}</tr>`;
@@ -353,9 +361,15 @@ function openDesign(c, n){
   cur = {c, n}; size = ''; $('dN').textContent = '';
   const pr = PRICES[c];
   $('dP').textContent = pr ? money(pr) : '';
-  $('sizes').hidden = $('add').hidden = !pr; $('ask').hidden = !!pr;
+  $('sizes').hidden = $('add').hidden = $('colorW').hidden = !pr; color = ''; fit = ''; $('ask').hidden = !!pr;
   $('ask').href = 'https://www.instagram.com/' + INSTAGRAM + '/';
   renderChart(c);
+  const cols = COLOR_ONLY[c] ? COLORS.filter(k => COLOR_ONLY[c].includes(k[0])) : COLORS;
+  $('colors').innerHTML = cols.map(([n, h]) => `<button class="chip" data-col="${n}">${h ? `<i class="sw" style="background:${h}"></i>` : ''}${n}</button>`).join('');
+  const fl = FITS[c] || [];
+  $('fitW').hidden = fl.length < 2;
+  fit = fl.length === 1 ? fl[0] : '';
+  $('fits').innerHTML = fl.length > 1 ? fl.map(f => `<button class="chip" data-fit="${f}">${f}</button>`).join('') : '';
   $('sizes').innerHTML = SIZES.map(z => `<button class="chip" data-s="${z}">${z}</button>`).join('');
   const th = $('thumbs'); th.innerHTML = '';
   $('mainImg').src = img(c, n, 1);
@@ -401,7 +415,7 @@ $('dlg').addEventListener('click', e => { if(e.target === $('dlg')) $('dlg').clo
 
 
 // ===== السلة والطلب =====
-let cart = [], cur = null, size = '', ord = null;
+let cart = [], cur = null, size = '', color = '', fit = '', ord = null;
 try{ cart = JSON.parse(localStorage.getItem('rb_cart') || '[]'); }catch(_){}
 const money = v => v.toLocaleString('en-US') + ' جنيه';
 const sub = () => cart.reduce((a, x) => a + (PRICES[x.c] || 0) * x.q, 0);
@@ -414,12 +428,12 @@ function updateCart(){
   const el = $('cartList');
   $('cartSum').hidden = !cart.length;
   if(!cart.length){ el.innerHTML = '<div class="empty">السلة فاضية.</div>'; return; }
-  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} ${x.n}</b><small>المقاس ${x.s} · ${money(PRICES[x.c])}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
+  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} ${x.n}</b><small>${x.f ? x.f + ' · ' : ''}المقاس ${x.s} · اللون ${x.col || '-'} · ${money(PRICES[x.c])}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
   $('cartSub').textContent = money(sub());
 }
 function sumHTML(){
   const s = sub(), r = priceOf($('gov').value, $('area').value), g = r ? r[0] : null;
-  return `<div><span>المنتجات</span><b>${money(s)}</b></div><div><span>الشحن</span><b>${g == null ? 'اختار المحافظة والمنطقة' : money(g)}</b></div>` +
+  return `<div><span>المنتجات</span><b>${money(s)}</b></div><div><span>مدة التجهيز</span><b>${PROD_DAYS} أيام</b></div><div><span>الشحن</span><b>${g == null ? 'اختار المحافظة والمنطقة' : money(g)}</b></div>` +
     (r ? `<div><span>مدة التوصيل</span><b>${r[1]}</b></div>` : '') +
     `<div class="tt"><span>الإجمالي</span><b>${g == null ? '—' : money(s + g)}</b></div>`;
 }
@@ -427,7 +441,7 @@ function step(n){ [1, 2, 3].forEach(i => $('s' + i).hidden = i !== n); $('coDlg'
 function orderText(){
   return `طلب جديد ${ord.id}\nالاسم: ${ord.name}\nالموبايل: ${ord.phone}\nالمحافظة: ${ord.gov}\nالمنطقة: ${ord.area || '-'}\nالعنوان: ${ord.addr}\n` +
     (ord.note ? `ملاحظات: ${ord.note}\n` : '') + '\n' +
-    ord.items.map(x => `- ${label(x.c)} تصميم ${x.n} | مقاس ${x.s} | عدد ${x.q}`).join('\n') +
+    ord.items.map(x => `- ${label(x.c)} تصميم ${x.n} ${x.f ? '| ' + x.f + ' ' : ''}| مقاس ${x.s} | لون ${x.col || '-'} | عدد ${x.q}`).join('\n') +
     `\n\nالمنتجات: ${ord.sub} | الشحن: ${ord.ship} | الإجمالي: ${ord.total} جنيه\nالدفع: InstaPay (صورة التحويل مرفقة)`;
 }
 document.addEventListener('click', e => {
@@ -437,6 +451,10 @@ document.addEventListener('click', e => {
   if(r){ cart.splice(+r.dataset.rm, 1); updateCart(); return; }
   const z = e.target.closest('[data-s]');
   if(z){ size = z.dataset.s; $('dN').textContent = ''; $('sizes').querySelectorAll('button').forEach(b => b.classList.toggle('on', b === z)); return; }
+  const k = e.target.closest('[data-col]');
+  if(k){ color = k.dataset.col; $('dN').textContent = ''; $('colors').querySelectorAll('button').forEach(b => b.classList.toggle('on', b === k)); return; }
+  const ft = e.target.closest('[data-fit]');
+  if(ft){ fit = ft.dataset.fit; $('dN').textContent = ''; $('fits').querySelectorAll('button').forEach(b => b.classList.toggle('on', b === ft)); return; }
   const cl = e.target.closest('[data-close]');
   if(cl) cl.closest('dialog').close();
 });
@@ -444,8 +462,10 @@ document.addEventListener('click', e => {
 $('cartBtn').onclick = () => { updateCart(); $('cartDlg').showModal(); };
 $('add').onclick = () => {
   if(!size){ $('dN').textContent = 'اختار المقاس الأول.'; return; }
-  const f = cart.find(x => x.c === cur.c && x.n === cur.n && x.s === size);
-  f ? f.q++ : cart.push({c: cur.c, n: cur.n, s: size, q: 1});
+  if((FITS[cur.c] || []).length > 1 && !fit){ $('dN').textContent = 'اختار القصّة (Over ولا Boxy).'; return; }
+  if(!color){ $('dN').textContent = 'اختار اللون.'; return; }
+  const f = cart.find(x => x.c === cur.c && x.n === cur.n && x.s === size && x.col === color && x.f === fit);
+  f ? f.q++ : cart.push({c: cur.c, n: cur.n, s: size, col: color, f: fit, q: 1});
   updateCart(); $('dlg').close(); $('cartDlg').showModal();
 };
 $('gov').innerHTML = '<option value="">اختار المحافظة</option>' + Object.keys(GOVS).map(g => `<option>${g}</option>`).join('');
@@ -486,10 +506,10 @@ function notifyOwner(o){
   const send = (m, body) => fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
   }).then(r => r.json()).then(j => { if(!j.ok) console.warn('Telegram:', j.description); }).catch(e => console.warn('Telegram:', e));
-  const lines = o.items.map(x => `• ${label(x.c)} ${x.n} | ${x.s} | x${x.q}`).join('\n');
+  const lines = o.items.map(x => `• ${label(x.c)} ${x.n}${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q}`).join('\n');
   send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
     (o.note ? `📝 ${o.note}\n` : '') + `\n💰 منتجات ${o.sub} + شحن ${o.ship} = ${o.total} جنيه`});
-  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} ${x.n} | ${x.s} | x${x.q} (${o.id})`}));
+  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} ${x.n}${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q} (${o.id})`}));
 }
 $('confirm').onclick = () => {
   notifyOwner(ord);
@@ -498,6 +518,8 @@ $('confirm').onclick = () => {
   cart = []; updateCart(); step(3);
 };
 $('sendIg').onclick = () => { try{ navigator.clipboard.writeText($('otext').value); }catch(_){} };
+$('prodN').textContent = 'التصنيع بالطلب: التجهيز حوالي ' + PROD_DAYS + ' أيام قبل الشحن.';
+$('prodP').textContent = 'كل قطعة بتتصنّع بالطلب، فمدة التجهيز حوالي ' + PROD_DAYS + ' أيام قبل الشحن، وبعدها وقت التوصيل زي الجدول تحت.';
 updateCart();
 
 fetch('designs.json', {cache: 'no-store'})
