@@ -240,6 +240,7 @@ details{margin-top:12px;font-size:14px}summary{cursor:pointer;font-weight:700}
     <p class="pol"><b>مهم:</b> الطلب مش هيتشحن إلا بعد ما نستلم سكرين التحويل على انستجرام. ابعت الرسالة دي مع السكرين دلوقتي:</p>
     <textarea class="box" id="otext" readonly rows="8"></textarea>
     <a class="wa" id="sendIg" target="_blank" rel="noopener" style="width:100%">انسخ الطلب وافتح انستجرام</a>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px">هيتنسخ الطلب ويفتح بروفايلنا: دوس <b>Message</b> والصق الطلب وابعت معاه سكرين التحويل.</p>
   </div>
 </dialog>
 
@@ -269,7 +270,7 @@ const PRICES = {'hoodie':800, 'round':750, 'half-zip':950, 'straight-pants':750}
 const SIZES = ['M','L','XL','XXL'];
 // إشعار الطلبات على تليجرام (بيوصلك على الموبايل مع صور القطع). سيبهم فاضيين لو لسه معملتهمش.
 const TG_TOKEN = '9022300993:AAH6uyFkcgpnYqMwyEU0qYLojhEssB-NNc4';
-const TG_CHAT = '';
+const TG_CHAT = '2019563199';
 // جداول المقاسات بالسم: الطول ثم العرض
 const FIT = [['Over',[72,74,76,77],[60,62,64,66]], ['Boxy',[60,62,64,66],[68,69,70,71]]];
 const CHARTS = {hoodie: FIT, round: FIT};
@@ -353,7 +354,7 @@ function openDesign(c, n){
   const pr = PRICES[c];
   $('dP').textContent = pr ? money(pr) : '';
   $('sizes').hidden = $('add').hidden = !pr; $('ask').hidden = !!pr;
-  $('ask').href = 'https://ig.me/m/' + INSTAGRAM;
+  $('ask').href = 'https://www.instagram.com/' + INSTAGRAM + '/';
   renderChart(c);
   $('sizes').innerHTML = SIZES.map(z => `<button class="chip" data-s="${z}">${z}</button>`).join('');
   const th = $('thumbs'); th.innerHTML = '';
@@ -484,7 +485,7 @@ function notifyOwner(o){
   o.sent = true;
   const send = (m, body) => fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
-  }).catch(() => {});
+  }).then(r => r.json()).then(j => { if(!j.ok) console.warn('Telegram:', j.description); }).catch(e => console.warn('Telegram:', e));
   const lines = o.items.map(x => `• ${label(x.c)} ${x.n} | ${x.s} | x${x.q}`).join('\n');
   send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
     (o.note ? `📝 ${o.note}\n` : '') + `\n💰 منتجات ${o.sub} + شحن ${o.ship} = ${o.total} جنيه`});
@@ -493,7 +494,7 @@ function notifyOwner(o){
 $('confirm').onclick = () => {
   notifyOwner(ord);
   $('oid').textContent = ord.id; $('otext').value = orderText();
-  $('sendIg').href = 'https://ig.me/m/' + INSTAGRAM;
+  $('sendIg').href = 'https://www.instagram.com/' + INSTAGRAM + '/';
   cart = []; updateCart(); step(3);
 };
 $('sendIg').onclick = () => { try{ navigator.clipboard.writeText($('otext').value); }catch(_){} };
