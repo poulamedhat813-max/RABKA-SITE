@@ -134,6 +134,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 .big{font-size:30px;font-weight:900}
 .ship{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:6px}
 .ship div{border:1px solid var(--line);padding:14px}.ship b{display:block}.ship small{color:var(--muted)}
+details{margin-top:12px;font-size:14px}summary{cursor:pointer;font-weight:700}
+.ct2{width:100%;border-collapse:collapse;margin:8px 0;text-align:center}.ct2 th,.ct2 td{border:1px solid var(--line);padding:6px}.ct2 caption{text-align:start;font-weight:700;padding:6px 0}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -235,7 +237,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div id="s3" hidden>
     <h3>تم تسجيل طلبك</h3>
     <p>رقم الطلب: <b id="oid"></b></p>
-    <p class="pol">طلبك بيتأكد أول ما نستلم رسالتك وصورة التحويل على انستجرام. ابعتهم دلوقتي:</p>
+    <p class="pol"><b>مهم:</b> الطلب مش هيتشحن إلا بعد ما نستلم سكرين التحويل على انستجرام. ابعت الرسالة دي مع السكرين دلوقتي:</p>
     <textarea class="box" id="otext" readonly rows="8"></textarea>
     <a class="wa" id="sendIg" target="_blank" rel="noopener" style="width:100%">انسخ الطلب وافتح انستجرام</a>
   </div>
@@ -249,6 +251,7 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
       <h3 id="dT"></h3><p id="dC"></p>
       <p class="pr" id="dP"></p>
       <div class="chips" id="sizes" role="group" aria-label="المقاس"></div>
+      <details id="chart" hidden><summary>جدول المقاسات</summary><div id="chartBody"></div></details>
       <button class="wa" id="add">أضف للسلة</button>
       <a class="wa" id="ask" target="_blank" rel="noopener" hidden>اسأل عن السعر على انستجرام</a>
       <p id="dN" class="err"></p>
@@ -263,7 +266,19 @@ const INSTAPAY_LINK = 'https://ipn.eg/S/pola.demian/instapay/5DR8yG';
 const INSTAPAY_ADDR = 'pola.demian@instapay';
 // أسعار الأصناف (ناقص: tee, interlock, straight-pants-summer, womens-oversized، ضيف سعرهم هنا)
 const PRICES = {'hoodie':800, 'round':750, 'half-zip':950, 'straight-pants':750};
-const SIZES = ['S','M','L','XL','XXL'];
+const SIZES = ['M','L','XL','XXL'];
+// إشعار الطلبات على تليجرام (بيوصلك على الموبايل مع صور القطع). سيبهم فاضيين لو لسه معملتهمش.
+const TG_TOKEN = '9022300993:AAH6uyFkcgpnYqMwyEU0qYLojhEssB-NNc4';
+const TG_CHAT = '';
+// جداول المقاسات بالسم: الطول ثم العرض
+const FIT = [['Over',[72,74,76,77],[60,62,64,66]], ['Boxy',[60,62,64,66],[68,69,70,71]]];
+const CHARTS = {hoodie: FIT, round: FIT};
+function renderChart(c){
+  const f = CHARTS[c]; $('chart').hidden = !f; if(!f) return; $('chart').open = false;
+  const row = (t, a) => `<tr><th>${t}</th>${a.map(v => `<td>${v}</td>`).join('')}</tr>`;
+  $('chartBody').innerHTML = f.map(([n, a, b]) => `<table class="ct2"><caption>${n}</caption><tr><th>سم</th>${SIZES.map(z => `<th>${z}</th>`).join('')}</tr>${row('الطول', a)}${row('العرض', b)}</table>`).join('') +
+    '<small style="color:var(--muted)">الطول من الكتف لتحت، والعرض عند الصدر (القطعة مفرودة).</small>';
+}
 // أسعار الشحن (من جدول شركة QP)
 const T1 = '24 ساعة', T2 = '24-48 ساعة';
 const A = (names, p, t) => Object.fromEntries(names.split('،').map(n => [n, [p, t]]));
@@ -339,6 +354,7 @@ function openDesign(c, n){
   $('dP').textContent = pr ? money(pr) : '';
   $('sizes').hidden = $('add').hidden = !pr; $('ask').hidden = !!pr;
   $('ask').href = 'https://ig.me/m/' + INSTAGRAM;
+  renderChart(c);
   $('sizes').innerHTML = SIZES.map(z => `<button class="chip" data-s="${z}">${z}</button>`).join('');
   const th = $('thumbs'); th.innerHTML = '';
   $('mainImg').src = img(c, n, 1);
@@ -463,7 +479,19 @@ $('toPay').onclick = () => {
   step(2);
 };
 $('back').onclick = () => step(1);
+function notifyOwner(o){
+  if(!TG_TOKEN || !TG_CHAT || o.sent) return;
+  o.sent = true;
+  const send = (m, body) => fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
+  }).catch(() => {});
+  const lines = o.items.map(x => `• ${label(x.c)} ${x.n} | ${x.s} | x${x.q}`).join('\n');
+  send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
+    (o.note ? `📝 ${o.note}\n` : '') + `\n💰 منتجات ${o.sub} + شحن ${o.ship} = ${o.total} جنيه`});
+  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} ${x.n} | ${x.s} | x${x.q} (${o.id})`}));
+}
 $('confirm').onclick = () => {
+  notifyOwner(ord);
   $('oid').textContent = ord.id; $('otext').value = orderText();
   $('sendIg').href = 'https://ig.me/m/' + INSTAGRAM;
   cart = []; updateCart(); step(3);
