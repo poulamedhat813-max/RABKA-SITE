@@ -5,54 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>لوحة صور RABKA</title>
 <meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#060606; --surface:#0e0e10; --surface-2:#141416; --line:#2b2b2d;
-    --ink:#f1efea; --muted:#948f88; --accent:#c9c4b8; --danger:#c9645b; --ok:#7fae86;
+    --ink:#f1efea; --muted:#948f88; --accent:#c9c4b8; --danger:#c9645b; --ok:#7fae86; --warn:#d9a35b;
     color-scheme: dark;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
-  html,body{ height:100%; }
+  [hidden]{ display:none!important; }
+  html,body{ min-height:100%; }
   body{ background:var(--bg); color:var(--ink); font-family:'Tajawal', sans-serif; line-height:1.7; }
-  button{ font-family:inherit; cursor:pointer; }
+  button{ font-family:inherit; cursor:pointer; color:inherit; }
   img{ max-width:100%; display:block; }
   .wrap{ max-width:880px; margin:0 auto; padding:28px 20px 80px; }
   h1{ font-size:clamp(22px,4vw,30px); font-weight:900; }
   .sub{ color:var(--muted); font-size:14px; margin-top:6px; }
-  .steps{ margin-top:22px; padding:16px 18px; background:var(--surface); border:1px solid var(--line); font-size:13.5px; color:var(--muted); }
+  .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .steps{ margin-top:18px; padding:16px 18px; background:var(--surface-2); border:1px solid var(--line); font-size:13.5px; color:var(--muted); }
   .steps b{ color:var(--ink); }
   .steps ol{ padding-inline-start:20px; margin-top:6px; }
   .steps li{ margin-top:4px; }
   .panel{ margin-top:26px; padding:20px; background:var(--surface); border:1px solid var(--line); }
-  .panel h2{ font-size:15px; margin-bottom:4px; }
-  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .panel h2{ font-size:16px; margin-bottom:4px; }
+  .row{ display:flex; gap:14px; flex-wrap:wrap; margin-top:14px; }
   .field{ flex:1; min-width:180px; }
   label.field-label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
   select, input[type="number"], input[type="text"], input[type="password"]{
     width:100%; background:var(--surface-2); border:1px solid var(--line);
     color:var(--ink); padding:11px 12px; font-family:inherit; font-size:14.5px;
   }
-  select:focus, input:focus{ outline:2px solid var(--accent); outline-offset:1px; }
-  .slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:18px; }
+  select:focus, input:focus, button:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .slots{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
   @media (max-width:520px){ .slots{ grid-template-columns:repeat(2,1fr); } }
   .slot{ position:relative; aspect-ratio:1; background:var(--surface-2); border:1px dashed var(--line); display:flex; align-items:center; justify-content:center; overflow:hidden; text-align:center; }
   .slot.filled{ border-style:solid; }
   .slot input[type="file"]{ display:none; }
-  .slot .tapzone{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:none; border:none; color:inherit; width:100%; height:100%; }
+  .slot .tapzone{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:none; border:none; width:100%; height:100%; }
   .slot .placeholder{ font-size:12px; color:var(--muted); padding:6px; }
   .slot .placeholder b{ display:block; color:var(--ink); font-size:20px; font-weight:400; margin-bottom:4px; }
   .slot img{ width:100%; height:100%; object-fit:cover; pointer-events:none; }
-  .slot .rm{ position:absolute; top:4px; left:4px; width:22px; height:22px; background:rgba(6,6,6,.75); color:var(--ink); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:13px; z-index:2; }
+  .slot .rm{ position:absolute; top:4px; left:4px; width:26px; height:26px; background:rgba(6,6,6,.75); border:1px solid var(--line); font-size:14px; z-index:2; }
   .slot .tag{ position:absolute; bottom:0; right:0; left:0; padding:3px 6px; font-size:10.5px; background:rgba(6,6,6,.7); color:var(--muted); text-align:center; }
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 20px; border:1px solid var(--accent); color:var(--bg); background:var(--accent); font-weight:700; font-size:14.5px; }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 20px; border:1px solid var(--accent); color:var(--bg); background:var(--accent); font-weight:700; font-size:14.5px; text-decoration:none; }
   .btn:disabled{ opacity:.4; cursor:not-allowed; }
   .btn.ghost{ background:transparent; color:var(--ink); border-color:var(--line); }
-  .btn.danger{ background:transparent; color:var(--danger); border-color:var(--danger); }
+  .btn.sm{ padding:8px 14px; font-size:13px; }
   .actions{ margin-top:18px; display:flex; gap:12px; flex-wrap:wrap; }
-  .status{ font-size:13px; color:var(--muted); margin-top:10px; min-height:16px; }
+  .status{ font-size:13px; color:var(--muted); margin-top:10px; min-height:18px; }
+  .status.err{ color:var(--danger); }
   .badge{ display:inline-flex; align-items:center; gap:6px; font-size:12.5px; padding:6px 10px; border:1px solid var(--line); margin-top:12px; }
   .badge.ok{ border-color:var(--ok); color:var(--ok); }
   .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; }
@@ -60,14 +64,14 @@
   .litem{ display:flex; align-items:center; gap:12px; padding:10px; background:var(--surface-2); border:1px solid var(--line); font-size:13.5px; }
   .litem img{ width:44px; height:44px; object-fit:cover; flex:none; }
   .hint{ font-size:12.5px; color:var(--muted); margin-top:10px; min-height:18px; }
-  .hint.warn{ color:#d9a35b; }
+  .hint.warn{ color:var(--warn); }
   .mcat{ font-size:13px; color:var(--muted); font-weight:500; margin:18px 0 8px; }
   .dgrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
   .dcard{ background:var(--surface-2); border:1px solid var(--line); display:flex; flex-direction:column; }
   .dcard img{ width:100%; aspect-ratio:1; object-fit:cover; background:#000; }
   .dcard .dname{ font-size:13px; padding:8px 10px 4px; }
   .dcard .dbtns{ display:flex; gap:6px; padding:6px 10px 10px; }
-  .dcard .dbtns button{ flex:1; padding:7px 4px; font-size:12px; background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .dcard .dbtns button{ flex:1; padding:7px 4px; font-size:12px; background:transparent; border:1px solid var(--line); }
   .dcard .dbtns button.del{ color:var(--danger); border-color:var(--danger); }
   .dcard .dbtns button:disabled{ opacity:.4; cursor:not-allowed; }
   .toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
@@ -75,69 +79,72 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>لوحة صور RABKA</h1>
-  <p class="sub">ارفع صورة التصميم من هنا، وتظهر على موقعك الرسمي أوتوماتيك خلال دقيقة تقريبًا — من غير ملفات مضغوطة ولا رفع يدوي.</p>
+  <div class="top">
+    <div>
+      <h1>لوحة صور RABKA</h1>
+      <p class="sub">ارفع صور التصميم من هنا، وتظهر على الموقع أوتوماتيك خلال دقيقة تقريبًا.</p>
+    </div>
+    <a class="btn ghost sm" href="./" target="_blank" rel="noopener">افتح الموقع</a>
+  </div>
 
   <div class="panel" id="settingsPanel">
     <h2>الإعداد (مرة واحدة بس)</h2>
-    <p class="sub" style="margin-bottom:14px;">محتاج تربط اللوحة دي بريبوزيتوري موقعك على GitHub. اعمل التوكن من الخطوات تحت، والصقه هنا.</p>
+    <p class="sub">اربط اللوحة بالريبو بتاع الموقع على GitHub.</p>
     <div class="row">
       <div class="field">
-        <label class="field-label">اسم المستخدم على GitHub</label>
-        <input type="text" id="ghOwner" placeholder="مثلاً: mohamed123">
+        <label class="field-label" for="ghOwner">اسم المستخدم على GitHub</label>
+        <input type="text" id="ghOwner" value="poulamedhat813-max" autocomplete="off">
       </div>
       <div class="field">
-        <label class="field-label">اسم الريبوزيتوري</label>
-        <input type="text" id="ghRepo" placeholder="RABKA-SITE" value="RABKA-SITE">
+        <label class="field-label" for="ghRepo">اسم الريبو</label>
+        <input type="text" id="ghRepo" value="RABKA-SITE" autocomplete="off">
       </div>
     </div>
-    <div class="row" style="margin-top:14px;">
+    <div class="row">
       <div class="field">
-        <label class="field-label">GitHub Personal Access Token</label>
-        <input type="password" id="ghToken" placeholder="github_pat_...">
+        <label class="field-label" for="ghToken">GitHub Personal Access Token</label>
+        <input type="password" id="ghToken" placeholder="github_pat_..." autocomplete="off">
       </div>
     </div>
     <div class="actions">
-      <button class="btn" id="saveSettingsBtn">حفظ الإعداد</button>
+      <button class="btn" id="saveSettingsBtn">حفظ وفحص التوكن</button>
       <button class="btn ghost" id="clearSettingsBtn">مسح البيانات المحفوظة</button>
     </div>
     <div id="connBadge"></div>
+    <div class="status" id="setStatus"></div>
 
-    <div class="steps" style="margin-top:18px;">
-      <b>ازاي تعمل التوكن (خطوة أول مرة بس):</b>
+    <div class="steps">
+      <b>ازاي تعمل التوكن (أول مرة بس):</b>
       <ol>
-        <li>افتح <span class="sub" style="color:var(--ink);">github.com/settings/personal-access-tokens/new</span> وانت داخل حسابك.</li>
-        <li>في Repository access اختار Only select repositories، واختار ريبوزيتوري rabka-site.</li>
+        <li>افتح github.com/settings/personal-access-tokens/new وانت داخل حسابك.</li>
+        <li>حط اسم للتوكن، و<b>تاريخ انتهاء</b> (مثلاً 90 يوم).</li>
+        <li>في Repository access اختار Only select repositories، واختار RABKA-SITE.</li>
         <li>تحت Permissions دوس Contents واختار Access: Read and write.</li>
-        <li>دوس Generate token، وانسخ التوكن (بيبدأ بـ github_pat_).</li>
-        <li>الصقه في الخانة فوق ودوس "حفظ الإعداد". التوكن بيتخزن في متصفحك بس، مش بيترفع على الموقع.</li>
+        <li>دوس Generate token وانسخه (بيبدأ بـ github_pat_) والصقه فوق ودوس "حفظ وفحص التوكن".</li>
       </ol>
+      <p style="margin-top:8px">التوكن بيتخزن في متصفحك بس. متفتحش اللوحة من جهاز مش بتاعك، ولو اتسرّب امسحه من GitHub واعمل واحد جديد.</p>
     </div>
   </div>
 
   <div class="panel">
     <h2>ارفع تصميم</h2>
-    <div class="row" style="margin-top:14px;">
+    <div class="row">
       <div class="field">
-        <label class="field-label">الصنف</label>
-        <select id="category">
-          <option value="hoodie">Hoodie — هودي</option>
-          <option value="round">Round — راوند</option>
-          <option value="straight-pants">Straight Pants — شتوي</option>
-          <option value="half-zip">Half Zip</option>
-          <option value="tee">Tee — تيشيرت صيفي</option>
-          <option value="interlock">Interlock Box Fit</option>
-          <option value="straight-pants-summer">Straight Pants — صيفي</option>
-          <option value="womens-oversized">Women's Oversized</option>
-        </select>
+        <label class="field-label" for="category">الصنف</label>
+        <select id="category"></select>
       </div>
       <div class="field" style="max-width:160px;">
-        <label class="field-label">رقم التصميم</label>
+        <label class="field-label" for="designNum">رقم التصميم</label>
         <input type="number" id="designNum" min="1" value="1">
       </div>
     </div>
 
     <p class="hint" id="numHint"></p>
+    <div class="actions" style="margin-top:12px;">
+      <button class="btn ghost sm" id="multiBtn">اختار كذا صورة مرة واحدة</button>
+      <input type="file" id="multiIn" accept="image/*" multiple hidden>
+    </div>
+    <p class="hint">الصورة الأولى هي الرئيسية. رتّب الصور من غير فراغ (1 ثم 2 ثم 3...). لو اخترت كذا صورة مرة واحدة هتتوزع بالترتيب على الخانات الفاضية حسب اسم الملف.</p>
     <div class="slots" id="slots"></div>
 
     <div class="actions">
@@ -150,9 +157,9 @@
   <div class="panel">
     <div class="toolbar">
       <h2>التصاميم الحالية على الموقع</h2>
-      <button class="btn ghost" id="refreshBtn" style="padding:8px 14px; font-size:13px;">تحديث القايمة</button>
+      <button class="btn ghost sm" id="refreshBtn">تحديث القايمة</button>
     </div>
-    <p class="sub" style="margin-top:4px;">"استبدال" بيفتح خانة الرفع على نفس التصميم (الصور اللي تختارها بس هي اللي بتتبدل). "حذف" بيشيل التصميم من الموقع وبيمسح صوره من الريبو.</p>
+    <p class="sub">"استبدال" بيفتح خانة الرفع على نفس التصميم (الصور اللي تختارها بس هي اللي بتتبدل). "حذف" بيشيل التصميم من الموقع وبيمسح صوره من الريبو.</p>
     <div id="manage"></div>
     <div class="status" id="manageStatus"></div>
   </div>
@@ -164,150 +171,132 @@
 </div>
 
 <script>
+  // الأصناف (لازم تطابق الأصناف في index.html). لإضافة صنف جديد ضيفه هنا وفي index.html.
   const CATS = [
-    ['hoodie','Hoodie'],['round','Round'],['straight-pants','Straight Pants (شتوي)'],
-    ['half-zip','Half Zip'],['tee','Tee'],['interlock','Interlock Box Fit'],
+    ['hoodie','Hoodie'],['round','Round'],['straight-pants','Sweatpants'],['half-zip','Zipper'],
+    ['tee','Tee (صيفي)'],['interlock','Interlock Box Fit'],
     ['straight-pants-summer','Straight Pants (صيفي)'],['womens-oversized',"Women's Oversized"]
   ];
-  const catLabel = id => (CATS.find(c=>c[0]===id) || [id,id])[1];
+  const catLabel = id => (CATS.find(c => c[0] === id) || [id, id])[1];
   const SLOT_COUNT = 6;
   const STORAGE_KEY = 'rabka_admin_gh_settings';
-  const MAX_DIM = 1400;        // أقصى طول/عرض للصورة بعد الضغط (بكسل)
-  const JPEG_QUALITY = 0.82;   // جودة الـ JPEG بعد الضغط
+  const MAX_DIM = 1400;       // أقصى طول/عرض للصورة بعد الضغط (بكسل)
+  const JPEG_QUALITY = 0.82;  // جودة الـ JPEG بعد الضغط
 
   let slots = new Array(SLOT_COUNT).fill(null);
   let manifest = {};
   let manifestLoaded = false;
   let busy = false;
   const branchCache = {};
+  const bust = Date.now();
+  const $ = id => document.getElementById(id);
+  const enc = encodeURIComponent;
+  const esc = t => String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmtKB = b => (b / 1024).toFixed(0) + ' KB';
 
-  const slotsEl = document.getElementById('slots');
-  const statusEl = document.getElementById('status');
-  const logEl = document.getElementById('log');
-  const uploadBtn = document.getElementById('uploadBtn');
-  const connBadge = document.getElementById('connBadge');
-  const manageEl = document.getElementById('manage');
-  const manageStatusEl = document.getElementById('manageStatus');
-  const numHintEl = document.getElementById('numHint');
-  const categoryEl = document.getElementById('category');
-  const designNumEl = document.getElementById('designNum');
+  const slotsEl = $('slots'), statusEl = $('status'), logEl = $('log'), uploadBtn = $('uploadBtn');
+  const connBadge = $('connBadge'), manageEl = $('manage'), manageStatusEl = $('manageStatus');
+  const numHintEl = $('numHint'), categoryEl = $('category'), designNumEl = $('designNum'), setStatusEl = $('setStatus');
 
-  const esc = t => String(t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const fmtKB = b => (b/1024).toFixed(0) + ' KB';
+  categoryEl.innerHTML = CATS.map(c => `<option value="${c[0]}">${esc(c[1])}</option>`).join('');
+
+  function setStatus(el, msg, isErr){ el.textContent = msg; el.classList.toggle('err', !!isErr); }
 
   // ---------- settings ----------
   function loadSettings(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch(e){ return null; }
-  }
-  function saveSettingsToStorage(s){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch(e){}
+    try{ const raw = localStorage.getItem(STORAGE_KEY); return raw ? JSON.parse(raw) : null; }
+    catch(e){ return null; }
   }
   function validSettings(s){ return !!(s && s.owner && s.repo && s.token); }
   function requireSettings(target){
     const s = loadSettings();
-    if(!validSettings(s)){
-      (target || statusEl).textContent = 'اعمل الإعداد فوق الأول (اسم المستخدم، الريبو، والتوكن).';
-      return null;
-    }
+    if(!validSettings(s)){ setStatus(target || statusEl, 'اعمل الإعداد فوق الأول (اسم المستخدم، الريبو، والتوكن).', true); return null; }
     return s;
   }
   function renderBadge(){
     const s = loadSettings();
-    if(validSettings(s)){
-      connBadge.innerHTML = `<span class="badge ok"><span class="dot"></span> متصل بـ ${esc(s.owner)}/${esc(s.repo)}</span>`;
-    } else {
-      connBadge.innerHTML = `<span class="badge"><span class="dot"></span> مش متصل لسه</span>`;
-    }
+    connBadge.innerHTML = validSettings(s)
+      ? `<span class="badge ok"><span class="dot"></span> متصل بـ ${esc(s.owner)}/${esc(s.repo)}</span>`
+      : `<span class="badge"><span class="dot"></span> مش متصل لسه</span>`;
   }
-  (function initSettingsFields(){
+  (function initSettings(){
     const s = loadSettings();
-    if(s){
-      document.getElementById('ghOwner').value = s.owner || '';
-      document.getElementById('ghRepo').value = s.repo || 'RABKA-SITE';
-      document.getElementById('ghToken').value = s.token || '';
-    }
+    if(s){ $('ghOwner').value = s.owner || ''; $('ghRepo').value = s.repo || 'RABKA-SITE'; $('ghToken').value = s.token || ''; }
     renderBadge();
   })();
-  document.getElementById('saveSettingsBtn').addEventListener('click', ()=>{
-    const owner = document.getElementById('ghOwner').value.trim();
-    const repo = document.getElementById('ghRepo').value.trim();
-    const token = document.getElementById('ghToken').value.trim();
-    if(!owner || !repo || !token){
-      statusEl.textContent = 'حط اسم المستخدم واسم الريبو والتوكن الأول.';
-      return;
+
+  $('saveSettingsBtn').addEventListener('click', async () => {
+    const s = { owner: $('ghOwner').value.trim(), repo: $('ghRepo').value.trim(), token: $('ghToken').value.trim() };
+    if(!validSettings(s)){ setStatus(setStatusEl, 'حط اسم المستخدم واسم الريبو والتوكن الأول.', true); return; }
+    setStatus(setStatusEl, 'بيتأكد من التوكن...');
+    try{
+      await verifyConn(s);
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){}
+      renderBadge();
+      setStatus(setStatusEl, 'التوكن شغال واتحفظ الإعداد. (صلاحية الكتابة بتتأكد وقت أول رفع.)');
+      loadManage();
+    } catch(err){
+      setStatus(setStatusEl, 'مش قادر يتصل: ' + err.message, true);
     }
-    saveSettingsToStorage({owner, repo, token});
-    renderBadge();
-    statusEl.textContent = 'اتحفظ الإعداد.';
-    loadManage();
   });
-  document.getElementById('clearSettingsBtn').addEventListener('click', ()=>{
-    localStorage.removeItem(STORAGE_KEY);
-    document.getElementById('ghOwner').value = '';
-    document.getElementById('ghRepo').value = 'RABKA-SITE';
-    document.getElementById('ghToken').value = '';
+  $('clearSettingsBtn').addEventListener('click', () => {
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+    $('ghToken').value = '';
     manifest = {}; manifestLoaded = false;
-    renderBadge();
+    renderBadge(); setStatus(setStatusEl, 'اتمسحت البيانات المحفوظة.');
     loadManage();
   });
 
   // ---------- slots ----------
+  function setSlot(i, file){
+    if(slots[i]) URL.revokeObjectURL(slots[i].url);
+    slots[i] = { file, url: URL.createObjectURL(file) };
+  }
   function renderSlots(){
     slotsEl.innerHTML = '';
-    slots.forEach((s, i)=>{
+    slots.forEach((s, i) => {
       const div = document.createElement('div');
       div.className = 'slot' + (s ? ' filled' : '');
+      const name = i === 0 ? 'الصورة الرئيسية' : 'صورة ' + (i + 1);
       if(s){
-        div.innerHTML = `<img src="${s.url}"><button type="button" class="rm" data-i="${i}">×</button><span class="tag">${i===0?'رئيسية':'صورة '+(i+1)}</span>`;
+        div.innerHTML = `<img src="${s.url}" alt=""><button type="button" class="rm" data-i="${i}" aria-label="مسح">×</button><span class="tag">${i === 0 ? 'رئيسية' : 'صورة ' + (i + 1)}</span>`;
       } else {
-        div.innerHTML = `
-          <input type="file" accept="image/*" id="file-input-${i}" data-i="${i}">
-          <button type="button" class="tapzone" data-i="${i}">
-            <div class="placeholder"><b>+</b>${i===0?'الصورة الرئيسية':'صورة '+(i+1)}</div>
-          </button>`;
+        div.innerHTML = `<input type="file" accept="image/*" id="file-input-${i}" data-i="${i}">
+          <button type="button" class="tapzone" data-i="${i}"><div class="placeholder"><b>+</b>${name}</div></button>`;
       }
       slotsEl.appendChild(div);
     });
-    slotsEl.querySelectorAll('.tapzone').forEach(btn=>{
-      btn.addEventListener('click', ()=> document.getElementById('file-input-'+btn.dataset.i).click());
-    });
-    slotsEl.querySelectorAll('input[type="file"]').forEach(inp=>{
-      inp.addEventListener('change', e=>{
-        const i = +inp.dataset.i;
-        const file = e.target.files[0];
-        if(!file) return;
-        if(slots[i]) URL.revokeObjectURL(slots[i].url);
-        slots[i] = { file, url: URL.createObjectURL(file) };
-        renderSlots();
-      });
-    });
-    slotsEl.querySelectorAll('.rm').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const i = +btn.dataset.i;
-        URL.revokeObjectURL(slots[i].url);
-        slots[i] = null;
-        renderSlots();
-      });
-    });
+    slotsEl.querySelectorAll('.tapzone').forEach(btn => btn.addEventListener('click', () => $('file-input-' + btn.dataset.i).click()));
+    slotsEl.querySelectorAll('input[type="file"]').forEach(inp => inp.addEventListener('change', e => {
+      const file = e.target.files[0]; if(!file) return;
+      setSlot(+inp.dataset.i, file); renderSlots();
+    }));
+    slotsEl.querySelectorAll('.rm').forEach(btn => btn.addEventListener('click', () => {
+      const i = +btn.dataset.i; URL.revokeObjectURL(slots[i].url); slots[i] = null; renderSlots();
+    }));
   }
   renderSlots();
 
   function clearSlots(){
-    slots.forEach(s=>{ if(s) URL.revokeObjectURL(s.url); });
+    slots.forEach(s => { if(s) URL.revokeObjectURL(s.url); });
     slots = new Array(SLOT_COUNT).fill(null);
     renderSlots();
   }
-  document.getElementById('clearSlotsBtn').addEventListener('click', ()=>{
-    clearSlots();
-    statusEl.textContent = '';
+  $('clearSlotsBtn').addEventListener('click', () => { clearSlots(); setStatus(statusEl, ''); });
+
+  $('multiBtn').addEventListener('click', () => $('multiIn').click());
+  $('multiIn').addEventListener('change', e => {
+    const files = [...e.target.files].sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+    e.target.value = '';
+    const empty = slots.map((s, i) => s ? -1 : i).filter(i => i >= 0);
+    files.slice(0, empty.length).forEach((f, k) => setSlot(empty[k], f));
+    renderSlots();
+    setStatus(statusEl, files.length > empty.length ? `اتحط ${empty.length} صورة بس (أقصى عدد ${SLOT_COUNT}).` : '');
   });
 
   // ---------- image conversion + compression ----------
   function fileToJpegBlob(file){
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
@@ -318,20 +307,19 @@
         canvas.width = w; canvas.height = h;
         const ctx = canvas.getContext('2d');
         ctx.imageSmoothingQuality = 'high';
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0,0,w,h);
-        ctx.drawImage(img,0,0,w,h);
-        canvas.toBlob(blob=>{
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => {
           URL.revokeObjectURL(url);
-          if(blob) resolve(blob); else reject(new Error('فشل تحويل الصورة'));
+          blob ? resolve(blob) : reject(new Error('فشل تحويل الصورة'));
         }, 'image/jpeg', JPEG_QUALITY);
       };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('الصورة دي مش بتتفتح، جرّب صورة تانية')); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('الصورة دي مش بتتفتح، جرّب صورة تانية (JPG أو PNG)')); };
       img.src = url;
     });
   }
   function blobToBase64(blob){
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(String(reader.result).split(',')[1]);
       reader.onerror = reject;
@@ -340,51 +328,45 @@
   }
 
   // ---------- GitHub API ----------
-  function ghHeaders(token, json){
+  const ghHeaders = (token, json) => {
     const h = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' };
     if(json) h['Content-Type'] = 'application/json';
     return h;
-  }
-  function contentsUrl(s, path){
-    return `https://api.github.com/repos/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}/contents/` +
-           path.split('/').map(encodeURIComponent).join('/');
-  }
+  };
+  const repoUrl = s => `https://api.github.com/repos/${enc(s.owner)}/${enc(s.repo)}`;
+  const contentsUrl = (s, path) => repoUrl(s) + '/contents/' + path.split('/').map(enc).join('/');
   async function ghError(res){
     let msg = 'HTTP ' + res.status;
-    try{ const e = await res.json(); if(e.message) msg = e.message; } catch(_){}
+    try{ const e = await res.json(); if(e.message) msg = e.message; }catch(_){}
     if(res.status === 401) msg += ' — التوكن غلط أو منتهي';
     if(res.status === 403) msg += ' — التوكن مالوش صلاحية Contents: Read and write';
-    if(res.status === 404) msg += ' — اتأكد من اسم المستخدم والريبو';
+    if(res.status === 404) msg += ' — اتأكد من اسم المستخدم والريبو وإن التوكن مربوط بالريبو ده';
     return new Error(msg);
   }
   // بنقرأ الفرع الافتراضي للريبو بدل ما نفترض إنه main
-  async function getBranch(s){
-    const key = s.owner + '/' + s.repo;
-    if(branchCache[key]) return branchCache[key];
-    const res = await fetch(`https://api.github.com/repos/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}`,
-      { headers: ghHeaders(s.token), cache: 'no-store' });
+  async function verifyConn(s){
+    const res = await fetch(repoUrl(s), { headers: ghHeaders(s.token), cache: 'no-store' });
     if(!res.ok) throw await ghError(res);
     const data = await res.json();
-    branchCache[key] = data.default_branch || 'main';
+    branchCache[s.owner + '/' + s.repo] = data.default_branch || 'main';
+  }
+  async function getBranch(s){
+    const key = s.owner + '/' + s.repo;
+    if(!branchCache[key]) await verifyConn(s);
     return branchCache[key];
   }
   async function ghGetFile(s, path){
     const branch = await getBranch(s);
-    const res = await fetch(contentsUrl(s, path) + '?ref=' + encodeURIComponent(branch),
-      { headers: ghHeaders(s.token), cache: 'no-store' });
+    const res = await fetch(contentsUrl(s, path) + '?ref=' + enc(branch), { headers: ghHeaders(s.token), cache: 'no-store' });
     if(res.status === 404) return null;
     if(!res.ok) throw await ghError(res);
     return res.json();
   }
-  // ---------- commit واحد لكل التغييرات (Git Data API) ----------
-  // بدل ما نعمل commit لكل صورة (يعني 7 عمليات نشر ورا بعض)، بنجمّع الصور
-  // و designs.json في commit واحد، فـ GitHub Pages بينشر مرة واحدة بس.
-  function branchPath(b){ return b.split('/').map(encodeURIComponent).join('/'); }
+  // commit واحد لكل التغييرات (Git Data API): الصور و designs.json مع بعض، فالنشر بيحصل مرة واحدة
+  const branchPath = b => b.split('/').map(enc).join('/');
   async function gitCall(s, tail, method, body){
-    const url = `https://api.github.com/repos/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}/git/${tail}`;
-    const res = await fetch(url, {
-      method, headers: ghHeaders(s.token, !!body), cache: 'no-store',
-      body: body ? JSON.stringify(body) : undefined
+    const res = await fetch(repoUrl(s) + '/git/' + tail, {
+      method, headers: ghHeaders(s.token, !!body), cache: 'no-store', body: body ? JSON.stringify(body) : undefined
     });
     if(!res.ok) throw await ghError(res);
     return res.json();
@@ -392,29 +374,21 @@
   async function commitChanges(s, { files = [], deletes = [], message }){
     const branch = await getBranch(s);
     const ref = await gitCall(s, 'ref/heads/' + branchPath(branch), 'GET');
-    const baseCommitSha = ref.object.sha;
-    const baseCommit = await gitCall(s, 'commits/' + baseCommitSha, 'GET');
-
-    // الصور بتترفع كلها في نفس الوقت
-    const blobs = await Promise.all(files.map(f =>
-      gitCall(s, 'blobs', 'POST', { content: f.base64, encoding: 'base64' })
-    ));
+    const baseSha = ref.object.sha;
+    const baseCommit = await gitCall(s, 'commits/' + baseSha, 'GET');
+    const blobs = await Promise.all(files.map(f => gitCall(s, 'blobs', 'POST', { content: f.base64, encoding: 'base64' })));
     const entries = files.map((f, i) => ({ path: f.path, mode: '100644', type: 'blob', sha: blobs[i].sha }))
       .concat(deletes.map(path => ({ path, mode: '100644', type: 'blob', sha: null })));
-
     const tree = await gitCall(s, 'trees', 'POST', { base_tree: baseCommit.tree.sha, tree: entries });
-    const commit = await gitCall(s, 'commits', 'POST', { message, tree: tree.sha, parents: [baseCommitSha] });
+    const commit = await gitCall(s, 'commits', 'POST', { message, tree: tree.sha, parents: [baseSha] });
     await gitCall(s, 'refs/heads/' + branchPath(branch), 'PATCH', { sha: commit.sha });
   }
 
-  // ---------- designs.json manifest ----------
-  function decodeB64Utf8(b64){
-    const bin = atob(b64.replace(/\n/g, ''));
-    return new TextDecoder().decode(Uint8Array.from(bin, c=>c.charCodeAt(0)));
-  }
+  // ---------- designs.json ----------
+  const decodeB64Utf8 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, '')), c => c.charCodeAt(0)));
   function encodeB64Utf8(str){
     let bin = '';
-    new TextEncoder().encode(str).forEach(b=>{ bin += String.fromCharCode(b); });
+    new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); });
     return btoa(bin);
   }
   async function readManifest(s){
@@ -424,48 +398,40 @@
     catch(e){ throw new Error('ملف designs.json فيه خطأ في الصيغة'); }
   }
   function normalizeManifest(json){
-    Object.keys(json).forEach(k=>{
-      json[k] = [...new Set(json[k])].sort((a,b)=>a-b);
+    Object.keys(json).forEach(k => {
+      json[k] = [...new Set(json[k])].sort((a, b) => a - b);
       if(!json[k].length) delete json[k];
     });
     return json;
   }
-  function manifestFile(json){
-    return { path: 'designs.json', base64: encodeB64Utf8(JSON.stringify(json, null, 2)) };
-  }
+  const manifestFile = json => ({ path: 'designs.json', base64: encodeB64Utf8(JSON.stringify(json, null, 2)) });
 
-  // ---------- hint: new vs existing design number ----------
+  // ---------- hint ----------
   function nextNumberFor(cat){
     const list = manifest[cat] || [];
     return list.length ? Math.max(...list) + 1 : 1;
   }
   function updateDesignHint(){
     if(!manifestLoaded){ numHintEl.textContent = ''; numHintEl.className = 'hint'; return; }
-    const cat = categoryEl.value;
-    const n = parseInt(designNumEl.value, 10);
+    const cat = categoryEl.value, n = parseInt(designNumEl.value, 10);
     const exists = (manifest[cat] || []).includes(n);
-    if(exists){
-      numHintEl.textContent = `تصميم رقم ${n} موجود بالفعل: الصور اللي هترفعها بس هتتبدل، والباقي هيفضل زي ما هو.`;
-      numHintEl.className = 'hint warn';
-    } else {
-      numHintEl.textContent = `تصميم جديد رقم ${n}.`;
-      numHintEl.className = 'hint';
-    }
+    numHintEl.textContent = exists
+      ? `تصميم رقم ${n} موجود بالفعل: الصور اللي هترفعها بس هتتبدل، والباقي هيفضل زي ما هو.`
+      : `تصميم جديد رقم ${n}.`;
+    numHintEl.className = 'hint' + (exists ? ' warn' : '');
   }
-  categoryEl.addEventListener('change', ()=>{
+  categoryEl.addEventListener('change', () => {
     if(manifestLoaded) designNumEl.value = nextNumberFor(categoryEl.value);
     updateDesignHint();
   });
-  designNumEl.addEventListener('input', updateDesignHint);
+  designNumEl.addEventListener('input', () => { designNumEl.dataset.touched = '1'; updateDesignHint(); });
 
-  // ---------- manage existing designs ----------
-  function dcardHTML(s, cat, n){
-    const rel = `images/${cat}/${n}-1.jpg`;
-    const raw = `https://raw.githubusercontent.com/${encodeURIComponent(s.owner)}/${encodeURIComponent(s.repo)}/HEAD/${rel}`;
-    return `
-      <div class="dcard">
-        <img src="${rel}" alt="" loading="lazy" onerror="this.onerror=null;this.src='${raw}'">
-        <div class="dname">تصميم ${n}</div>
+  // ---------- manage ----------
+  function dcardHTML(cat, n){
+    const rel = `images/${cat}/${n}-1.jpg?v=${bust}`;
+    return `<div class="dcard">
+        <img src="${rel}" alt="" loading="lazy">
+        <div class="dname">${esc(catLabel(cat))} ${n}</div>
         <div class="dbtns">
           <button type="button" data-act="replace" data-cat="${cat}" data-n="${n}">استبدال</button>
           <button type="button" class="del" data-act="delete" data-cat="${cat}" data-n="${n}">حذف</button>
@@ -473,19 +439,15 @@
       </div>`;
   }
   function renderManage(){
-    const s = loadSettings();
-    const cats = CATS.map(c=>c[0]).filter(id=>(manifest[id] || []).length);
-    if(!cats.length){
-      manageEl.innerHTML = '<p class="sub" style="margin-top:14px;">مفيش تصاميم متضافة لسه.</p>';
-      return;
-    }
-    manageEl.innerHTML = cats.map(id=>
-      `<h3 class="mcat">${esc(catLabel(id))}</h3><div class="dgrid">${manifest[id].map(n=>dcardHTML(s, id, n)).join('')}</div>`
+    const cats = CATS.map(c => c[0]).filter(id => (manifest[id] || []).length);
+    if(!cats.length){ manageEl.innerHTML = '<p class="sub" style="margin-top:14px;">مفيش تصاميم متضافة لسه.</p>'; return; }
+    manageEl.innerHTML = cats.map(id =>
+      `<h3 class="mcat">${esc(catLabel(id))} (${manifest[id].length})</h3><div class="dgrid">${manifest[id].map(n => dcardHTML(id, n)).join('')}</div>`
     ).join('');
   }
   async function loadManage(){
     const s = loadSettings();
-    manageStatusEl.textContent = '';
+    setStatus(manageStatusEl, '');
     if(!validSettings(s)){
       manageEl.innerHTML = '<p class="sub" style="margin-top:14px;">اربط اللوحة بالريبو من الإعداد فوق عشان تظهر التصاميم.</p>';
       return;
@@ -501,21 +463,17 @@
       manageEl.innerHTML = `<p class="sub" style="margin-top:14px; color:var(--danger);">${esc(err.message)}</p>`;
     }
   }
-  designNumEl.addEventListener('input', ()=>{ designNumEl.dataset.touched = '1'; });
-  document.getElementById('refreshBtn').addEventListener('click', loadManage);
+  $('refreshBtn').addEventListener('click', loadManage);
 
-  manageEl.addEventListener('click', e=>{
+  manageEl.addEventListener('click', e => {
     const btn = e.target.closest('button[data-act]');
     if(!btn || busy) return;
-    const cat = btn.dataset.cat;
-    const n = parseInt(btn.dataset.n, 10);
+    const cat = btn.dataset.cat, n = parseInt(btn.dataset.n, 10);
     if(btn.dataset.act === 'replace'){
-      categoryEl.value = cat;
-      designNumEl.value = n;
-      designNumEl.dataset.touched = '1';
+      categoryEl.value = cat; designNumEl.value = n; designNumEl.dataset.touched = '1';
       updateDesignHint();
-      document.getElementById('slots').scrollIntoView({ behavior:'smooth', block:'center' });
-    } else if(btn.dataset.act === 'delete'){
+      slotsEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
       deleteDesign(cat, n);
     }
   });
@@ -523,34 +481,30 @@
   function setBusy(v){
     busy = v;
     uploadBtn.disabled = v;
-    manageEl.querySelectorAll('button').forEach(b=>{ b.disabled = v; });
+    manageEl.querySelectorAll('button').forEach(b => { b.disabled = v; });
   }
+  window.addEventListener('beforeunload', e => { if(busy){ e.preventDefault(); e.returnValue = ''; } });
 
   async function deleteDesign(cat, n){
     const s = requireSettings(manageStatusEl);
     if(!s) return;
-    if(!confirm(`حذف "${catLabel(cat)} — تصميم ${n}" نهائيًا؟\nهيتشال من الموقع وصوره هتتمسح من الريبو.`)) return;
+    if(!confirm(`حذف "${catLabel(cat)} ${n}" نهائيًا؟\nهيتشال من الموقع وصوره هتتمسح من الريبو.`)) return;
     setBusy(true);
     try{
-      manageStatusEl.textContent = 'بيجهّز الحذف...';
+      setStatus(manageStatusEl, 'بيجهّز الحذف...');
       const json = await readManifest(s);
       json[cat] = (json[cat] || []).filter(x => x !== n);
       normalizeManifest(json);
-
-      // نمسح بس الصور الموجودة فعلًا
       const candidates = [];
       for(let i = 1; i <= SLOT_COUNT; i++) candidates.push(`images/${cat}/${n}-${i}.jpg`);
       const found = await Promise.all(candidates.map(async path => (await ghGetFile(s, path)) ? path : null));
-      const deletes = found.filter(Boolean);
-
-      manageStatusEl.textContent = 'بيمسح في commit واحد...';
-      await commitChanges(s, { files: [manifestFile(json)], deletes, message: `Delete ${cat} design ${n}` });
+      setStatus(manageStatusEl, 'بيمسح في commit واحد...');
+      await commitChanges(s, { files: [manifestFile(json)], deletes: found.filter(Boolean), message: `Delete ${cat} design ${n}` });
       manifest = json; manifestLoaded = true;
-      renderManage();
-      updateDesignHint();
-      manageStatusEl.textContent = `اتحذف تصميم ${n}. الموقع هيتحدث خلال دقيقة تقريبًا.`;
+      renderManage(); updateDesignHint();
+      setStatus(manageStatusEl, `اتحذف ${catLabel(cat)} ${n}. الموقع هيتحدث خلال دقيقة تقريبًا.`);
     } catch(err){
-      manageStatusEl.textContent = 'حصل خطأ: ' + err.message;
+      setStatus(manageStatusEl, 'حصل خطأ: ' + err.message, true);
       loadManage();
     } finally {
       setBusy(false);
@@ -560,57 +514,60 @@
   function addLogItem(category, designNum, count, thumbUrl, savedText){
     const div = document.createElement('div');
     div.className = 'litem';
-    div.innerHTML = `<img src="${thumbUrl}" alt=""><div>${esc(catLabel(category))} — تصميم ${designNum} <span class="sub">(${count} صورة اترفعت${savedText ? ' — ' + savedText : ''})</span></div>`;
+    div.innerHTML = `<img src="${thumbUrl}" alt=""><div>${esc(catLabel(category))} ${designNum} <span class="sub">(${count} صورة اترفعت${savedText ? ' — ' + savedText : ''})</span></div>`;
     logEl.prepend(div);
   }
 
   // ---------- upload ----------
-  uploadBtn.addEventListener('click', async ()=>{
+  uploadBtn.addEventListener('click', async () => {
     if(busy) return;
     const s = requireSettings();
     if(!s) return;
     const category = categoryEl.value;
     const designNum = parseInt(designNumEl.value, 10);
-    if(!designNum || designNum < 1){ statusEl.textContent = 'حط رقم تصميم صحيح.'; return; }
+    if(!designNum || designNum < 1){ setStatus(statusEl, 'حط رقم تصميم صحيح.', true); return; }
 
     const exists = (manifest[category] || []).includes(designNum);
-    if(!slots[0] && !exists){ statusEl.textContent = 'محتاج الصورة الرئيسية على الأقل.'; return; }
-    if(!slots.some(Boolean)){ statusEl.textContent = 'اختار صورة واحدة على الأقل.'; return; }
+    if(!slots.some(Boolean)){ setStatus(statusEl, 'اختار صورة واحدة على الأقل.', true); return; }
+    if(!exists){
+      if(!slots[0]){ setStatus(statusEl, 'محتاج الصورة الرئيسية على الأقل.', true); return; }
+      const filled = slots.map((x, i) => x ? i : -1).filter(i => i >= 0);
+      if(filled.some((v, i) => v !== i)){ setStatus(statusEl, 'في فراغ بين الصور. رتّبهم من غير ما تسيب خانة فاضية في النص، عشان ماتظهرش صورة مكسورة في الموقع.', true); return; }
+    }
     if(exists && !confirm(`تصميم رقم ${designNum} موجود بالفعل.\nالصور اللي اخترتها بس هتتبدل، والباقي هيفضل زي ما هو. تكمّل؟`)) return;
 
     setBusy(true);
     try{
-      statusEl.textContent = 'بيضغط الصور...';
+      setStatus(statusEl, 'بيضغط الصور...');
       const jobs = slots.map((slot, i) => slot ? { slot, i } : null).filter(Boolean);
       const prepared = await Promise.all(jobs.map(async ({ slot, i }) => {
         const blob = await fileToJpegBlob(slot.file);
         return { i, blob, before: slot.file.size, base64: await blobToBase64(blob) };
       }));
       const before = prepared.reduce((a, x) => a + x.before, 0);
-      const after  = prepared.reduce((a, x) => a + x.blob.size, 0);
+      const after = prepared.reduce((a, x) => a + x.blob.size, 0);
       const thumbUrl = URL.createObjectURL(prepared[0].blob);
 
-      statusEl.textContent = 'بيرفع كل حاجة في commit واحد...';
+      setStatus(statusEl, 'بيرفع كل حاجة في commit واحد...');
       const json = await readManifest(s);
       if(!Array.isArray(json[category])) json[category] = [];
       json[category].push(designNum);
       normalizeManifest(json);
 
-      const files = prepared.map(x => ({ path: `images/${category}/${designNum}-${x.i+1}.jpg`, base64: x.base64 }));
+      const files = prepared.map(x => ({ path: `images/${category}/${designNum}-${x.i + 1}.jpg`, base64: x.base64 }));
       files.push(manifestFile(json));
       await commitChanges(s, { files, message: `Add ${category} design ${designNum} (${prepared.length} images)` });
       manifest = json; manifestLoaded = true;
 
-      const saved = before > 0 ? Math.max(0, Math.round((1 - after/before) * 100)) : 0;
-      statusEl.textContent = `تم رفع ${prepared.length} صورة لتصميم رقم ${designNum} (الحجم قل ${saved}%). الموقع هيتحدث لوحده خلال دقيقة تقريبًا.`;
+      const saved = before > 0 ? Math.max(0, Math.round((1 - after / before) * 100)) : 0;
+      setStatus(statusEl, `تم رفع ${prepared.length} صورة لـ ${catLabel(category)} رقم ${designNum} (الحجم قل ${saved}%). الموقع هيتحدث لوحده خلال دقيقة تقريبًا.`);
       addLogItem(category, designNum, prepared.length, thumbUrl, `${fmtKB(before)} ← ${fmtKB(after)}`);
       clearSlots();
       designNumEl.value = nextNumberFor(category);
       designNumEl.dataset.touched = '';
-      renderManage();
-      updateDesignHint();
+      renderManage(); updateDesignHint();
     } catch(err){
-      statusEl.textContent = 'حصل خطأ: ' + err.message;
+      setStatus(statusEl, 'حصل خطأ: ' + err.message, true);
     } finally {
       setBusy(false);
     }
