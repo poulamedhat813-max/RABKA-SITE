@@ -278,14 +278,15 @@ const PRICES = {
 const priceFor = (c, f) => { const p = PRICES[c]; return typeof p === 'number' ? p : (p && p[f]) || null; };
 const minPrice = c => { const p = PRICES[c]; return typeof p === 'number' ? p : p ? Math.min(...Object.values(p)) : null; };
 const fromTxt = c => { const p = PRICES[c]; return (p && typeof p === 'object' && new Set(Object.values(p)).size > 1) ? 'من ' : ''; };
+const priceLine = c => { const p = PRICES[c]; if(typeof p === 'number') return money(p); const v = Object.values(p); return new Set(v).size === 1 ? money(v[0]) : Object.entries(p).map(([f, x]) => f + ' ' + x).join(' · ') + ' جنيه'; };
 function updatePrice(){
   const p = priceFor(cur.c, fit);
-  $('dP').textContent = p ? money(p) : (PRICES[cur.c] ? fromTxt(cur.c) + money(minPrice(cur.c)) : '');
+  $('dP').textContent = p ? money(p) : '';
 }
 const SIZES = ['M','L','XL','XXL'];
 const PROD_DAYS = 5; // مدة التجهيز قبل الشحن (بالأيام)
 // الألوان المتاحة (الاسم، لون الدايرة). عدّل أو ضيف زي ما تحب.
-const COLORS = [['ابيض','#ffffff'],['اسود','#111111'],['بني','#6b4a35'],['بيج','#d8c3a5'],['حديدي','#4a4f55'],['زيتي','#5b5d2e'],['موف فاتح','#c3a6e0'],['بيبي بلو','#a8d0ee'],['جراي فاتح','#c9c9c9'],['مينت جرين','#a8e6cf'],['نبيتي','#6d1b2f'],['شانيه','#e6d3b0'],['فراني','']];
+const COLORS = [['ابيض','#ffffff'],['اسود','#111111'],['بني','#6b4a35'],['بيج','#d8c3a5'],['حديدي','#5f6770'],['زيتي','#5b5d2e'],['موف فاتح','#c3a6e0'],['بيبي بلو','#a8d0ee'],['جراي فاتح','#c9c9c9'],['مينت جرين','#a8e6cf'],['نبيتي','#6d1b2f'],['شانيه','#e6d3b0'],['فراني','#3d3d3f']];
 const COLOR_ONLY = {'half-zip': ['اسود','شانيه']}; // أصناف ألوانها محدودة
 const FITS = {hoodie: ['Over','Regular','Boxy'], round: ['Over','Boxy'], 'half-zip': ['Boxy']};
 // إشعار الطلبات على تليجرام (بيوصلك على الموبايل مع صور القطع). سيبهم فاضيين لو لسه معملتهمش.
@@ -361,7 +362,7 @@ function render(){
         <img src="${img(x.c, x.n, 1)}" alt="${label(x.c)} تصميم ${x.n}" loading="lazy">
         <img class="b" src="${img(x.c, x.n, 2)}" alt="" loading="lazy" onerror="this.remove()">
       </div>
-      <div class="n">${label(x.c)} ${x.n}</div>${PRICES[x.c] ? `<div class="c">${fromTxt(x.c)}${money(minPrice(x.c))}</div>` : ''}
+      <div class="n">${label(x.c)} ${x.n}</div>${PRICES[x.c] ? `<div class="c">${priceLine(x.c)}</div>` : ''}
     </button>`).join('') : '<div class="empty" style="grid-column:1/-1">مفيش تصاميم في الصنف ده لسه.</div>';
   $('pg').innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
     `<button class="${i + 1 === page ? 'on' : ''}" data-p="${i + 1}">${i + 1}</button>`).join('') : '';
