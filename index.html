@@ -359,18 +359,18 @@ function render(){
   $('grid').innerHTML = slice.length ? slice.map(x => `
     <button class="card" data-open="${x.c}:${x.n}">
       <div class="im"><span class="badge">جديد</span>
-        <img src="${img(x.c, x.n, 1)}" alt="${label(x.c)} تصميم ${x.n}" loading="lazy">
+        <img src="${img(x.c, x.n, 1)}" alt="${label(x.c)}" loading="lazy">
         <img class="b" src="${img(x.c, x.n, 2)}" alt="" loading="lazy" onerror="this.remove()">
       </div>
-      <div class="n">${label(x.c)} ${x.n}</div>${PRICES[x.c] ? `<div class="c">${priceLine(x.c)}</div>` : ''}
+      <div class="n">${label(x.c)}</div>${PRICES[x.c] ? `<div class="c">${priceLine(x.c)}</div>` : ''}
     </button>`).join('') : '<div class="empty" style="grid-column:1/-1">مفيش تصاميم في الصنف ده لسه.</div>';
   $('pg').innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
     `<button class="${i + 1 === page ? 'on' : ''}" data-p="${i + 1}">${i + 1}</button>`).join('') : '';
 }
 
 function openDesign(c, n){
-  $('dT').textContent = label(c) + ' ' + n;
-  $('dC').textContent = 'تصميم رقم ' + n;
+  $('dT').textContent = label(c);
+  $('dC').textContent = '';
   cur = {c, n}; size = ''; $('dN').textContent = '';
   const pr = !!PRICES[c];
   $('sizes').hidden = $('add').hidden = $('colorW').hidden = !pr; color = ''; fit = ''; $('ask').hidden = !!pr;
@@ -441,7 +441,7 @@ function updateCart(){
   const el = $('cartList');
   $('cartSum').hidden = !cart.length;
   if(!cart.length){ el.innerHTML = '<div class="empty">السلة فاضية.</div>'; return; }
-  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)} ${x.n}</b><small>${x.f ? x.f + ' · ' : ''}المقاس ${x.s} · اللون ${x.col || '-'} · ${money(priceFor(x.c, x.f))}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
+  el.innerHTML = cart.map((x, i) => `<div class="ci"><img src="${img(x.c, x.n, 1)}" alt=""><div class="ct"><b>${label(x.c)}</b><small>${x.f ? x.f + ' · ' : ''}المقاس ${x.s} · اللون ${x.col || '-'} · ${money(priceFor(x.c, x.f))}</small><div class="q"><button data-q="${i}:-1" aria-label="أقل">−</button><span>${x.q}</span><button data-q="${i}:1" aria-label="أكتر">+</button><button class="rmv" data-rm="${i}">حذف</button></div></div></div>`).join('');
   $('cartSub').textContent = money(sub());
 }
 function sumHTML(){
@@ -454,7 +454,7 @@ function step(n){ [1, 2, 3].forEach(i => $('s' + i).hidden = i !== n); $('coDlg'
 function orderText(){
   return `طلب جديد ${ord.id}\nالاسم: ${ord.name}\nالموبايل: ${ord.phone}\nالمحافظة: ${ord.gov}\nالمنطقة: ${ord.area || '-'}\nالعنوان: ${ord.addr}\n` +
     (ord.note ? `ملاحظات: ${ord.note}\n` : '') + '\n' +
-    ord.items.map(x => `- ${label(x.c)} تصميم ${x.n} ${x.f ? '| ' + x.f + ' ' : ''}| مقاس ${x.s} | لون ${x.col || '-'} | عدد ${x.q}`).join('\n') +
+    ord.items.map(x => `- ${label(x.c)} (كود ${x.n}) ${x.f ? '| ' + x.f + ' ' : ''}| مقاس ${x.s} | لون ${x.col || '-'} | عدد ${x.q}`).join('\n') +
     `\n\nالمنتجات: ${ord.sub} | الشحن: ${ord.ship} | الإجمالي: ${ord.total} جنيه\nالدفع: InstaPay (صورة التحويل مرفقة)`;
 }
 document.addEventListener('click', e => {
@@ -519,10 +519,10 @@ function notifyOwner(o){
   const send = (m, body) => fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
     method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
   }).then(r => r.json()).then(j => { if(!j.ok) console.warn('Telegram:', j.description); }).catch(e => console.warn('Telegram:', e));
-  const lines = o.items.map(x => `• ${label(x.c)} ${x.n}${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q}`).join('\n');
+  const lines = o.items.map(x => `• ${label(x.c)} (كود ${x.n})${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q}`).join('\n');
   send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
     (o.note ? `📝 ${o.note}\n` : '') + `\n💰 منتجات ${o.sub} + شحن ${o.ship} = ${o.total} جنيه`});
-  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} ${x.n}${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q} (${o.id})`}));
+  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} (كود ${x.n})${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q} (${o.id})`}));
 }
 $('confirm').onclick = () => {
   notifyOwner(ord);
