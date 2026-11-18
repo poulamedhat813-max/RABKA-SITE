@@ -513,16 +513,28 @@ $('toPay').onclick = () => {
   step(2);
 };
 $('back').onclick = () => step(1);
-function notifyOwner(o){
+async function notifyOwner(o){
   if(!TG_TOKEN || !TG_CHAT || o.sent) return;
   o.sent = true;
-  const send = (m, body) => fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
-    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
-  }).then(r => r.json()).then(j => { if(!j.ok) console.warn('Telegram:', j.description); }).catch(e => console.warn('Telegram:', e));
-  const lines = o.items.map(x => `• ${label(x.c)} (كود ${x.n})${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q}`).join('\n');
-  send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
+  const send = async (m, body) => {
+    try{
+      const r = await fetch('https://api.telegram.org/bot' + TG_TOKEN + '/' + m, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({chat_id: TG_CHAT, ...body})
+      });
+      const j = await r.json();
+      if(!j.ok) console.warn('Telegram ' + m + ':', j.description);
+      return !!j.ok;
+    }catch(e){ console.warn('Telegram ' + m + ':', e); return false; }
+  };
+  const url = x => new URL(img(x.c, x.n, 1), location.href).href;
+  const tag = x => `${label(x.c)} (كود ${x.n})${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q}`;
+  const lines = o.items.map(x => `• ${tag(x)}\n${url(x)}`).join('\n');
+  await send('sendMessage', {text: `🛍 طلب جديد ${o.id}\n⏳ مستني سكرين التحويل على انستجرام (متشحنش قبله)\n\n${lines}\n\n👤 ${o.name}\n📞 ${o.phone}\n📍 ${o.gov}${o.area ? ' - ' + o.area : ''}\n🏠 ${o.addr}\n` +
     (o.note ? `📝 ${o.note}\n` : '') + `\n💰 منتجات ${o.sub} + شحن ${o.ship} = ${o.total} جنيه`});
-  o.items.slice(0, 6).forEach(x => send('sendPhoto', {photo: new URL(img(x.c, x.n, 1), location.href).href, caption: `${label(x.c)} (كود ${x.n})${x.f ? ' ' + x.f : ''} | ${x.s} | ${x.col || '-'} | x${x.q} (${o.id})`}));
+  for(const x of o.items.slice(0, 6)){
+    await new Promise(r => setTimeout(r, 1100));
+    await send('sendPhoto', {photo: url(x), caption: `${tag(x)} (${o.id})`});
+  }
 }
 $('confirm').onclick = () => {
   notifyOwner(ord);
